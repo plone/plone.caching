@@ -9,6 +9,10 @@
     
     <include package="plone.registry" />
     
+    <!-- The 'Chain' response mutator -->
+    <adapter factory=".operations.Chain"   name="plone.caching.operations.chain" />
+    <utility component=".operations.Chain" name="plone.caching.operations.chain" />
+    
     <configure zcml:condition="installed ZPublisher.interfaces">
         
         <subscriber handler=".hooks.intercept" />

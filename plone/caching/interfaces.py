@@ -59,9 +59,10 @@ class ICacheInterceptor(Interface):
     """
     
     def __call__(ruleset, response):
-        """Mutate the response if required. Return ``True`` if the response
-        should be intercepted. In this case, normal rendering may be aborted
-        and the response returned as-is.
+        """Mutate the response if required, e.g. by setting headers. Return
+        None if the request should *not* be interrupted. Otherwise, return
+        a new response body as a unicode string. For simple 304 responses,
+        returning ``u""`` will suffice.
         
         ``rulset`` is the name of the caching ruleset that was matched. It may
         be ``None``. ``response`` is the current HTTP response.

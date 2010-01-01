@@ -273,7 +273,7 @@ class TestIntercept(unittest.TestCase):
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
     
-    def test_match_false(self):
+    def test_match_abort(self):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -293,7 +293,7 @@ class TestIntercept(unittest.TestCase):
             
             def __call__(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
-                return False
+                return None
         
         provideAdapter(DummyInterceptor, name="interceptor")
         
@@ -305,7 +305,7 @@ class TestIntercept(unittest.TestCase):
                            'X-Cache-Interceptor': ['interceptor'],
                            'X-Cache-Foo': ['test']}, dict(request.response))
     
-    def test_match_true(self):
+    def test_match_body(self):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -325,13 +325,20 @@ class TestIntercept(unittest.TestCase):
             
             def __call__(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
-                return True
+                return u"dummy"
         
         provideAdapter(DummyInterceptor, name="interceptor")
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertRaises(InterceptorControlFlowException, intercept, DummyEvent(request))
+        try:
+            intercept(DummyEvent(request))
+            self.fail()
+        except InterceptorControlFlowException, e:
+            self.assertEquals(u"dummy", e.responseBody)
+        except:
+            self.fail()
+            
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Interceptor': ['interceptor'],
@@ -357,7 +364,7 @@ class TestIntercept(unittest.TestCase):
             
             def __call__(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
-                return True
+                return u"dummy"
         
         provideAdapter(DummyInterceptor, name="interceptor")
         

@@ -1,0 +1,16 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="plone.caching">
+
+    <include package="z3c.caching" file="meta.zcml" />
+    <include package="z3c.caching" />
+    
+    <include package="plone.registry" />
+    
+    <subscriber
+        zcml:installed="ZPublisher.interfaces"
+        handler=".hooks.mutateResponse"
+        />
+    
+</configure>

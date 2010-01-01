@@ -45,15 +45,20 @@ def intercept(event):
         
         responseBody = interceptor(rulename, request.response)
         if responseBody is not None:
-            raise InterceptorControlFlowException(responseBody)
+            # This is pretty evil. To be able to set the response status in
+            # the view-on-exception hook, we need to be able to influence
+            # exception.__class__.__name__. Therefore, we generate a class
+            # to carry the exception.
+            raise type(str(event.request.response.getStatus()),
+                       (InterceptorControlFlowException,),
+                       {'responseBody': responseBody})()
 
 class InterceptorControlFlowException(Exception):
     """Exception raised in order to abort regular processing and attempt a 304
     type response instead.
     """
     
-    def __init__(self, responseBody=u""):
-        self.responseBody = responseBody
+    responseBody = u""
 
 class InterceptorResponse(object):
     """View for InterceptorControlFlowException, serving to return an empty

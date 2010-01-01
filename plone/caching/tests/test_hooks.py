@@ -28,7 +28,12 @@ class DummyResponse(dict):
     
     def addHeader(self, name, value):
         self.setdefault(name, []).append(value)
-
+    
+    def setStatus(self, value):
+        self.status = value
+    def getStatus(self):
+        return self.status
+    
 class DummyRequest(dict):
     def __init__(self, published, response):
         self['PUBLISHED'] = published
@@ -325,6 +330,7 @@ class TestIntercept(unittest.TestCase):
             
             def __call__(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
+                response.setStatus(304)
                 return u"dummy"
         
         provideAdapter(DummyInterceptor, name="interceptor")
@@ -336,8 +342,9 @@ class TestIntercept(unittest.TestCase):
             self.fail()
         except InterceptorControlFlowException, e:
             self.assertEquals(u"dummy", e.responseBody)
-        except:
-            self.fail()
+            self.assertEquals("304", e.__class__.__name__)
+        except Exception, e:
+            self.fail(str(e))
             
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({'X-Cache-Rule': ['testrule'],

@@ -1,6 +1,7 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:zcml="http://namespaces.zope.org/zcml"
+    xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="plone.caching">
 
     <include package="z3c.caching" file="meta.zcml" />
@@ -8,9 +9,18 @@
     
     <include package="plone.registry" />
     
-    <subscriber
-        zcml:installed="ZPublisher.interfaces"
-        handler=".hooks.mutateResponse"
-        />
+    <configure zcml:condition="installed ZPublisher.interfaces">
+        
+        <subscriber handler=".hooks.intercept" />
+        <subscriber handler=".hooks.mutateResponse" />
+        <browser:page
+            name="index.html"
+            for=".hooks.InterceptorControlFlowException"
+            class=".hooks.InterceptorResponse"
+            permission="zope2.Public"
+            />
+        
+    </configure>
+    
     
 </configure>

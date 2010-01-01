@@ -5,8 +5,9 @@ from zope import schema
 
 _ = zope.i18nmessageid.MessageFactory('plone.caching')
 
-X_CACHE_RULE_HEADER = 'X-Cache-Rule'
-X_MUTATOR_HEADER    = 'X-Cache-Operation'
+X_CACHE_RULE_HEADER  = 'X-Cache-Rule'
+X_MUTATOR_HEADER     = 'X-Cache-Mutator'
+X_INTERCEPTOR_HEADER = 'X-Cache-Interceptor'
 
 class ICacheSettings(Interface):
     """Settings expected to be found in plone.registry

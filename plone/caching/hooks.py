@@ -1,14 +1,13 @@
 import logging
 
-from zope.component import adapter
+from zope.component import adapter, queryMultiAdapter
 
 from ZPublisher.interfaces import IPubBeforeCommit, IPubAfterTraversal
 from ZODB.POSException import ConflictError
 
-from plone.caching.lookup import getResponseMutator, getCacheInterceptor
-
 from plone.caching.interfaces import X_CACHE_RULE_HEADER
 from plone.caching.interfaces import X_MUTATOR_HEADER, X_INTERCEPTOR_HEADER
+from plone.caching.interfaces import IOperationLookup
 
 logger = logging.getLogger('plone.caching')
 
@@ -22,8 +21,10 @@ def mutateResponse(event):
         published = request.get('PUBLISHED', None)
         if published is None:
             return
-    
-        rulename, operation, mutator = getResponseMutator(published, request)
+        
+        lookup = queryMultiAdapter((published, request,), IOperationLookup)
+        rulename, operation, mutator = lookup.getResponseMutator()
+        
         if mutator is not None:
         
             request.response.addHeader(X_CACHE_RULE_HEADER, rulename)
@@ -49,8 +50,10 @@ def intercept(event):
         published = request.get('PUBLISHED', None)
         if published is None:
             return
-    
-        rulename, operation, interceptor = getCacheInterceptor(published, request)
+        
+        lookup = queryMultiAdapter((published, request,), IOperationLookup)
+        rulename, operation, interceptor = lookup.getCacheInterceptor()
+        
         if interceptor is not None:
         
             request.response.addHeader(X_CACHE_RULE_HEADER, rulename)
@@ -70,7 +73,7 @@ def intercept(event):
     except InterceptorControlFlowException:
         raise
     except:
-        logging.exception("Swallowed exception in plone.caching IPubBeforeCommit event handler")
+        logging.exception("Swallowed exception in plone.caching IPubAfterTraversal event handler")
     
 class InterceptorControlFlowException(Exception):
     """Exception raised in order to abort regular processing and attempt a 304

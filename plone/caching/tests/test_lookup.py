@@ -18,8 +18,7 @@ from plone.registry.fieldfactory import persistentFieldAdapter
 
 from plone.caching.interfaces import ICacheSettings
 
-from plone.caching.lookup import getResponseMutator
-from plone.caching.lookup import getCacheInterceptor
+from plone.caching.lookup import DefaultOperationLookup
 
 class DummyView(object):
     pass
@@ -47,7 +46,8 @@ class TestLookupResponseMutator(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         
-        self.assertEquals((None, None, None,), getResponseMutator(view, request))
+        self.assertEquals((None, None, None,),
+                DefaultOperationLookup(view, request).getResponseMutator())
         
     def test_getResponseMutator_no_cache_rule(self):
         provideUtility(Registry(), IRegistry)
@@ -58,7 +58,8 @@ class TestLookupResponseMutator(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertEquals((None, None, None,), getResponseMutator(view, request))
+        self.assertEquals((None, None, None,),
+                DefaultOperationLookup(view, request).getResponseMutator())
         
     def test_getResponseMutator_no_mapping(self):
         provideUtility(Registry(), IRegistry)
@@ -71,7 +72,8 @@ class TestLookupResponseMutator(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertEquals((None, None, None,), getResponseMutator(view, request))
+        self.assertEquals((None, None, None,),
+                DefaultOperationLookup(view, request).getResponseMutator())
     
     def test_getResponseMutator_operation_not_found(self):
         provideUtility(Registry(), IRegistry)
@@ -85,7 +87,8 @@ class TestLookupResponseMutator(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertEquals(('testrule', 'notfound', None,), getResponseMutator(view, request))
+        self.assertEquals(('testrule', 'notfound', None,),
+                DefaultOperationLookup(view, request).getResponseMutator())
     
     def test_getResponseMutator_match(self):
         provideUtility(Registry(), IRegistry)
@@ -113,7 +116,7 @@ class TestLookupResponseMutator(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         
-        (rule, operation, mutator,) = getResponseMutator(view, request)
+        (rule, operation, mutator,) = DefaultOperationLookup(view, request).getResponseMutator()
         self.assertEquals('testrule', rule)
         self.assertEquals('mutator', operation)
         self.failUnless(isinstance(mutator, DummyMutator))
@@ -143,7 +146,8 @@ class TestLookupResponseMutator(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertEquals((None, None, None,), getResponseMutator(view, request))
+        self.assertEquals((None, None, None,), 
+                DefaultOperationLookup(view, request).getResponseMutator())
 
 class TestLookupCacheInterceptor(unittest.TestCase):
     
@@ -158,7 +162,8 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         
-        self.assertEquals((None, None, None,), getCacheInterceptor(view, request))
+        self.assertEquals((None, None, None,),
+                DefaultOperationLookup(view, request).getCacheInterceptor())
         
     def test_getCacheInterceptor_no_cache_rule(self):
         provideUtility(Registry(), IRegistry)
@@ -169,7 +174,8 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertEquals((None, None, None,), getCacheInterceptor(view, request))
+        self.assertEquals((None, None, None,),
+                DefaultOperationLookup(view, request).getCacheInterceptor())
         
     def test_getCacheInterceptor_no_mapping(self):
         provideUtility(Registry(), IRegistry)
@@ -182,7 +188,8 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertEquals((None, None, None,), getCacheInterceptor(view, request))
+        self.assertEquals((None, None, None,),
+                DefaultOperationLookup(view, request).getCacheInterceptor())
     
     def test_getCacheInterceptor_operation_not_found(self):
         provideUtility(Registry(), IRegistry)
@@ -196,7 +203,8 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertEquals(('testrule', 'notfound', None,), getCacheInterceptor(view, request))
+        self.assertEquals(('testrule', 'notfound', None,),
+                DefaultOperationLookup(view, request).getCacheInterceptor())
     
     def test_getCacheInterceptor_match(self):
         provideUtility(Registry(), IRegistry)
@@ -224,7 +232,7 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         
-        (rule, operation, interceptor,) = getCacheInterceptor(view, request)
+        (rule, operation, interceptor,) = DefaultOperationLookup(view, request).getCacheInterceptor()
         self.assertEquals('testrule', rule)
         self.assertEquals('interceptor', operation)
         self.failUnless(isinstance(interceptor, DummyInterceptor))
@@ -254,7 +262,8 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertEquals((None, None, None,), getCacheInterceptor(view, request))
+        self.assertEquals((None, None, None,),
+                DefaultOperationLookup(view, request).getCacheInterceptor())
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)

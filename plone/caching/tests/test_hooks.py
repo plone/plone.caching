@@ -18,6 +18,8 @@ from plone.caching.interfaces import ICacheInterceptor
 
 from plone.caching.interfaces import ICacheSettings
 
+from plone.caching.lookup import DefaultOperationLookup
+
 from plone.caching.hooks import mutateResponse, intercept
 from plone.caching.hooks import InterceptorControlFlowException
 
@@ -47,6 +49,7 @@ class TestMutateResponse(unittest.TestCase):
     
     def setUp(self):
         provideAdapter(RulesetRegistry)
+        provideAdapter(DefaultOperationLookup)
         provideAdapter(persistentFieldAdapter)
     
     def tearDown(self):
@@ -192,6 +195,7 @@ class TestIntercept(unittest.TestCase):
     
     def setUp(self):
         provideAdapter(RulesetRegistry)
+        provideAdapter(DefaultOperationLookup)
         provideAdapter(persistentFieldAdapter)
     
     def tearDown(self):

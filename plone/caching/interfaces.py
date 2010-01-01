@@ -160,3 +160,45 @@ class ICacheInterceptorType(ICacheOperationType):
     """``ICacheInterceptor`` equivalent of ``IResponseMutatorType`` - see
     above.
     """
+
+#
+# Internal abstractions
+# 
+
+class IOperationLookup(Interface):
+    """Abstraction for the lookup of response mutators. This is an unnamed
+    multi- adapter from (published, request).
+    
+    The main reason for needing this is that some publishable resources cannot
+    be adequately mapped to a rule set. In particular, CMF skin layer
+    resources can only be distinguished by their name, and cache rules may
+    vary depending on how they are acquired.
+    
+    We don't implement anything other than the default ``mutatorMapping`` and
+    ``interceptor`` mapping in this package, and would expect the use of a
+    custom ``IOperationLookup`` to be a last resort for integrators.
+    """
+    
+    def getResponseMutator():
+        """Get the response mutator for the adapted published object and
+        request.
+        
+        Returns a tuple ``(rulename, operation, mutator)`` where rulename is
+        the matched caching rule, operation is the name of the mutation
+        operation for that rule set, and mutator is an ``IResponseMutator``
+        for the published object (usually a view or similar). If caching is
+        disabled or there is not enough context to find a response mutator,
+        return ``(None, None, None,)``.
+        """
+    
+    def getCacheInterceptor():
+        """Get the cache interceptor for the adapted published object and
+        request.
+        
+        Return a tuple ``(rulename, operation, interceptor)`` where rulename
+        is the matched caching rule, operation is the name of the interceptor
+        operation for that rule set, and interceptor is an
+        ``ICacheInterceptor`` for the published object (usually a view or
+        similar). If caching is disabled or there is not enough context to
+        find a response interceptor, return ``(None, None, None,)``.
+        """

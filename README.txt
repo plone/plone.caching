@@ -96,9 +96,9 @@ purposes. Take a look at `z3c.caching`_ for details, but a simple example may
 look like this::
 
     <configure
-    xmlns="http://namespaces.zope.org/zope"
-    xmlns:browser="http://namespaces.zope.org/browser"
-    xmlns:cache="http://namespaces.zope.org/cache"/>
+        xmlns="http://namespaces.zope.org/zope"
+        xmlns:browser="http://namespaces.zope.org/browser"
+        xmlns:cache="http://namespaces.zope.org/cache"/>
 
         <cache:ruleset
             for=".frontpage.FrontpageView"

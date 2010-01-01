@@ -5,7 +5,6 @@ import zope.component.testing
 from zope.component import adapts, provideUtility, provideAdapter, getUtility
 from zope.interface import implements, Interface
 
-from z3c.caching.interfaces import IResponseMutator
 from z3c.caching.registry import RulesetRegistry
 import z3c.caching.registry
 
@@ -14,6 +13,7 @@ from plone.registry.interfaces import IRegistry
 from plone.registry import Registry
 from plone.registry.fieldfactory import persistentFieldAdapter
 
+from plone.caching.interfaces import IResponseMutator
 from plone.caching.interfaces import ICacheSettings
 
 from plone.caching.hooks import mutateResponse

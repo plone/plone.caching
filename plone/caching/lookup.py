@@ -4,8 +4,8 @@ from plone.registry.interfaces import IRegistry
 
 from z3c.caching.registry import lookup
 
-from z3c.caching.interfaces import IResponseMutator
-from z3c.caching.interfaces import ICacheInterceptor
+from plone.caching.interfaces import IResponseMutator
+from plone.caching.interfaces import ICacheInterceptor
 
 from plone.caching.interfaces import ICacheSettings
 

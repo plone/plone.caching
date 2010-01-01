@@ -5,8 +5,8 @@ import zope.component.testing
 from zope.component import adapts, provideUtility, provideAdapter, getUtility
 from zope.interface import implements, Interface
 
-from z3c.caching.interfaces import IResponseMutator
-from z3c.caching.interfaces import ICacheInterceptor
+from plone.caching.interfaces import IResponseMutator
+from plone.caching.interfaces import ICacheInterceptor
 
 from z3c.caching.registry import RulesetRegistry
 import z3c.caching.registry

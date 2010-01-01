@@ -1,10 +1,11 @@
-from zope.interface import implements, Interface
-from zope.component import adapts
+from zope.interface import implements, classProvides, Interface
+from zope.component import adapts, queryMultiAdapter
 
-from z3c.caching.interfaces import IResponseMutator
+from plone.caching.interfaces import IResponseMutator
+from plone.caching.interfaces import IResponseMutatorType
+from plone.caching.interfaces import _
 
-from plone.caching.lookup import getResponseMutator
-from plone.caching.utils import lookupOption
+from plone.caching.utils import lookupOptions
 
 class Chain(object):
     """Caching mutator which chains together several other mutators.
@@ -20,17 +21,28 @@ class Chain(object):
     implements(IResponseMutator)
     adapts(Interface, Interface)
     
+    # Type metadata
+    classProvides(IResponseMutatorType)
+    
+    title = _(u"Chain")
+    description = _(u"Allows multiple operations to be chained together")
     prefix = 'plone.caching.operations.chain'
+    options = ('operations',)
     
     def __init__(self, published, request):
         self.published = published
         self.request = request
         
     def __call__(self, rulename, response):
-        operations = lookupOption(self.prefix, rulename, 'operations', [])
-        for operation in operations:
-            oprulename, opname, mutator = getResponseMutator(self.published, self.request)
-            
-            response.addHeader('X-Cache-Chain-Operation', opname)
-            operation(rulename, response)
+        options = lookupOptions(self.__class__, rulename)
+        
+        if options['operations']:
+            for operation in options['operations']:
+                
+                mutator = queryMultiAdapter((self.published, self.request),
+                                            IResponseMutator, name=operation)
+                
+                if mutator is not None:
+                    response.addHeader('X-Cache-Chain-Operation', operation)
+                    mutator(rulename, response)
 

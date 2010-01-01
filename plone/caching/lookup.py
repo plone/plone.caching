@@ -22,7 +22,7 @@ def getResponseMutator(published, request):
     if registry is None:
         return None, None, None
     
-    settings = registry.forInterface(ICacheSettings)
+    settings = registry.forInterface(ICacheSettings, check=False)
     if not settings.enabled:
         return None, None, None
     
@@ -52,7 +52,7 @@ def getCacheInterceptor(published, request):
     if registry is None:
         return None, None, None
     
-    settings = registry.forInterface(ICacheSettings)
+    settings = registry.forInterface(ICacheSettings, check=False)
     if not settings.enabled:
         return None, None, None
     

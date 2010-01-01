@@ -69,6 +69,16 @@ class TestMutateResponse(unittest.TestCase):
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
     
+    def test_no_records(self):
+        provideUtility(Registry(), IRegistry)
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        
+        mutateResponse(DummyEvent(request))
+        
+        self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({}, dict(request.response))
+    
     def test_no_cache_rule(self):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
@@ -203,6 +213,18 @@ class TestIntercept(unittest.TestCase):
         
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
+    
+    def test_no_records(self):
+        provideUtility(Registry(), IRegistry)
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        
+        intercept(DummyEvent(request))
+        
+        self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({}, dict(request.response))
+    
     
     def test_no_cache_rule(self):
         provideUtility(Registry(), IRegistry)

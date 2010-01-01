@@ -39,7 +39,7 @@ Usage
 
 To use ``plone.caching``, you must first install it into your build and load
 its configuration. If you are using Plone, you can do that by installing
-``plone.app.caching``. Otherwise, depend on ``plone.caching`` in your
+`plone.app.caching`_. Otherwise, depend on ``plone.caching`` in your
 own package's ``setup.py``::
 
     install_requires = [
@@ -70,7 +70,7 @@ In tests, you can do the following::
     provideAdapter(Registry(), IRegistry)
 
 Next, you must add the ``plone.caching`` settings to the registry. If you use
-``plone.app.caching``, it will do this for you. Otherwise, you can register 
+`plone.app.caching`_, it will do this for you. Otherwise, you can register 
 them like so::
 
     from zope.component import getUtility
@@ -82,7 +82,7 @@ them like so::
 
 Finally, you must turn on the caching engine, by setting the registry value
 ``plone.caching.interfaces.ICacheSettings.enabled`` to ``True``.
-If you are using Plone and have installed ``plone.app.caching``, you can do
+If you are using Plone and have installed `plone.app.caching`_, you can do
 this from the caching control panel. In code, you can do::
 
     registry['plone.caching.interfaces.ICacheSettings.enabled'] = True
@@ -174,7 +174,7 @@ the registered instances of the ``IResponseMutatorType`` utility::
 
 The ``IResponseMutatorType`` utility provides properties like ``title`` and
 ``description`` to help build a user interface around caching operations.
-``plone.app.caching`` provides just such an interface.
+`plone.app.caching`_ provides just such an interface.
 
 Mapping cache rules to cache interceptors
 -----------------------------------------
@@ -227,15 +227,133 @@ Finally, note that it is generally safe to use caching operations if their
 registry keys are not installed. That is, they should fall back on sensible
 defaults and not crash.
 
+Writing response mutators and cache interceptors
+************************************************
+
+Now that we have seen how to configure cache rules and operations, let's look
+at how we can write our own response mutators.
+
 Writing a response mutator
 --------------------------
 
+Response mutators are typically used to set cache control response headers.
+They consist of two components:
 
+* A named multi-adapter implementing the operation itself
+* A named utility providing metadata about the operation
+
+Typically, both of these are implemented within a single class, although this
+is not a requirement. Typically, the operation will also look up options in
+accordance with the configuration methodology outlines above.
+
+Here is an example of an response mutator that sets a fixed max-age cache
+control header. It is registered for any published resource, and for any
+HTTP request (but not other types of request.)::
+
+    from zope.interface import implements, classProvides, Interface
+    from zope.component import adapts, queryMultiAdapter
+    
+    from zope.publisher.interfaces.http import IHTTPRequest
+    
+    from plone.caching.interfaces import IResponseMutator
+    from plone.caching.interfaces import IResponseMutatorType
+    
+    from plone.caching.utils import lookupOptions
+
+    class MaxAge(object):
+        implements(IResponseMutator)
+        adapts(Interface, IHTTPRequest)
+    
+        # Type metadata
+        classProvides(IResponseMutatorType)
+    
+        title = _(u"Max age")
+        description = _(u"Sets a fixed max age value")
+        prefix = 'plone.caching.tests.maxage'
+        options = ('maxAge',)
+    
+        def __init__(self, published, request):
+            self.published = published
+            self.request = request
+        
+        def __call__(self, rulename, response):
+            options = lookupOptions(self.__class__, rulename)
+            maxAge = options['maxAge'] or 3600
+            response.addHeader('Cache-Control', 'max-age=3600, must-revalidate' % maxAge)
+
+Note the use of the ``lookupOptions()`` helper method. You can pass this
+either a ``IResponseMutatorType`` (or ``ICacheInterceptorType``) instance,
+or the name of one (in which case it will be looked up from the utility
+registry), as well as the current rule name. It will return a dictionary of
+all the options listed (only ``maxAge`` in this case), taking rule set
+overrides into account. The options are guaranteed to be there, but will
+fall back on a default of ``None`` if not set. 
+
+To register this component in ZCML, we would do::
+
+    <adapter factory=".maxage.MaxAge" name="plone.caching.tests.maxage" />
+    <utility component=".maxage.MaxAge" name="plone.caching.tests.maxage" />
+
+Note that by using ``component`` instead of ``factory`` in the ``<utility />``
+declaration, we register the class object itself as the utility. The
+attributes are provided as class variables for that reason - setting them in
+``__init__()``, for example, would not work.
 
 Writing a cache interceptor
 ---------------------------
 
+Cache interceptors are again similar to response mutators. The main
+difference, apart from the timing of their execution, is that they return a
+response body. If they return ``None``, the request is *not* intercepted, and
+view rendering continues as normal.
 
+Here is a simple example that sends a 304 not modified response always. (This
+is probably not very useful, but it serves as an example.)::
+
+    from zope.interface import implements, classProvides, Interface
+    from zope.component import adapts, queryMultiAdapter
+    
+    from zope.publisher.interfaces.http import IHTTPRequest
+    
+    from plone.caching.interfaces import ICacheInterceptor
+    from plone.caching.interfaces import ICacheInterceptorType
+    
+    from plone.caching.utils import lookupOptions
+
+    class Always304(object):
+        implements(IResponseMutator)
+        adapts(Interface, IHTTPRequest)
+    
+        # Type metadata
+        classProvides(ICacheInterceptorType)
+    
+        title = _(u"Always send 304")
+        description = _(u"It's not modified, dammit!")
+        prefix = 'plone.caching.tests.always304'
+        options = ('temporarilyDisable',)
+    
+        def __init__(self, published, request):
+            self.published = published
+            self.request = request
+        
+        def __call__(self, rulename, response):
+            options = lookupOptions(self.__class__, rulename)
+            if options['temporarilyDisable']:
+                return None
+            
+            response.setStatus(304)
+            return u""
+
+Here, we return None to indicate that the request should not be intercepted if
+the ``temporarilyDisable`` option is set to ``True``. Otherwise, we modify
+the response and return a response body. The return value must be a unicode
+string. In this case, an empty string will suffice.
+
+The ZCML registration would look like this::
+
+    <adapter factory=".always.Always304" name="plone.caching.tests.always304" />
+    <utility component=".always.Always304" name="plone.caching.tests.always304" />
 
 .. _z3c.caching: http://pypi.python.org/pypi/z3c.caching
 .. _plone.registry: http://pypi.python.org/pypi/plone.registry
+.. _plone.app.caching: http://pypi.python.org/pypi/plone.app.caching

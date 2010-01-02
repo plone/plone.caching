@@ -118,6 +118,17 @@ look like this::
 Here, the view implemented by the class ``FrontpageView`` is associated with
 the rule set ``plone-content-types``.
 
+Elsewhere (or in the same file) the ``plone-content-types`` ruleset should be
+declared with a title and description. This is can be used by a UI such as
+that provided by `plone.app.caching`_. If "explicit" mode is set in
+``z3c.caching``, this is required. By default it is optional::
+
+        <cache:rulesetType
+            name="plone-content-types"
+            title="Plone content types"
+            description="Non-container content types"
+            />
+
 Hints:
 
 * Try to re-use existing rule sets rather than invent your own.

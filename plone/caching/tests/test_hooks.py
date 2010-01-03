@@ -26,6 +26,10 @@ from plone.caching.hooks import InterceptorControlFlowException
 class DummyView(object):
     pass
 
+class DummyResource(object):
+    def index_html(self):
+        return 'binary data'
+
 class DummyResponse(dict):
     
     def addHeader(self, name, value):
@@ -158,6 +162,37 @@ class TestMutateResponse(unittest.TestCase):
         request = DummyRequest(view, DummyResponse())
         mutateResponse(DummyEvent(request))
         self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({'X-Cache-Rule': ['testrule'],
+                           'X-Cache-Mutator': ['mutator'],
+                           'X-Cache-Foo': ['test']}, dict(request.response))
+    
+    def test_match_method(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        
+        z3c.caching.registry.register(DummyResource, 'testrule')
+        settings.mutatorMapping = {'testrule': 'mutator'}
+        
+        class DummyMutator(object):
+            implements(IResponseMutator)
+            adapts(Interface, Interface)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self, rulename, response):
+                response.addHeader('X-Cache-Foo', 'test')
+        
+        provideAdapter(DummyMutator, name="mutator")
+        
+        resource = DummyResource()
+        request = DummyRequest(resource.index_html, DummyResponse())
+        mutateResponse(DummyEvent(request))
+        self.assertEquals({'PUBLISHED': resource.index_html}, dict(request))
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Mutator': ['mutator'],
                            'X-Cache-Foo': ['test']}, dict(request.response))
@@ -351,6 +386,47 @@ class TestIntercept(unittest.TestCase):
             self.fail(str(e))
             
         self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({'X-Cache-Rule': ['testrule'],
+                           'X-Cache-Interceptor': ['interceptor'],
+                           'X-Cache-Foo': ['test']}, dict(request.response))
+    
+    def test_match_body_method(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        
+        z3c.caching.registry.register(DummyResource, 'testrule')
+        settings.interceptorMapping = {'testrule': 'interceptor'}
+        
+        class DummyInterceptor(object):
+            implements(ICacheInterceptor)
+            adapts(Interface, Interface)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self, rulename, response):
+                response.addHeader('X-Cache-Foo', 'test')
+                response.setStatus(304)
+                return u"dummy"
+        
+        provideAdapter(DummyInterceptor, name="interceptor")
+        
+        resource = DummyResource()
+        request = DummyRequest(resource.index_html, DummyResponse())
+        try:
+            intercept(DummyEvent(request))
+            self.fail()
+        except InterceptorControlFlowException, e:
+            self.assertEquals(u"dummy", e.responseBody)
+            self.assertEquals("304", e.__class__.__name__)
+        except Exception, e:
+            self.fail(str(e))
+            
+        self.assertEquals({'PUBLISHED': resource.index_html}, dict(request))
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Interceptor': ['interceptor'],
                            'X-Cache-Foo': ['test']}, dict(request.response))

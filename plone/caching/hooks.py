@@ -1,3 +1,4 @@
+import types
 import logging
 
 from zope.component import adapter, queryMultiAdapter
@@ -21,6 +22,10 @@ def mutateResponse(event):
         published = request.get('PUBLISHED', None)
         if published is None:
             return
+        
+        # If we get a method, try to look up its class
+        if isinstance(published, types.MethodType):
+            published = getattr(published, 'im_self', published)
         
         lookup = queryMultiAdapter((published, request,), IOperationLookup)
         rulename, operation, mutator = lookup.getResponseMutator()
@@ -50,6 +55,10 @@ def intercept(event):
         published = request.get('PUBLISHED', None)
         if published is None:
             return
+        
+        # If we get a method, try to look up its class
+        if isinstance(published, types.MethodType):
+            published = getattr(published, 'im_self', published)
         
         lookup = queryMultiAdapter((published, request,), IOperationLookup)
         rulename, operation, interceptor = lookup.getCacheInterceptor()

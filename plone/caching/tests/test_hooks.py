@@ -381,7 +381,7 @@ class TestIntercept(unittest.TestCase):
             self.fail()
         except InterceptorControlFlowException, e:
             self.assertEquals(u"dummy", e.responseBody)
-            self.assertEquals("304", e.__class__.__name__)
+            self.assertEquals("NotModified", e.__class__.__name__)
         except Exception, e:
             self.fail(str(e))
             
@@ -410,7 +410,7 @@ class TestIntercept(unittest.TestCase):
             
             def __call__(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
-                response.setStatus(304)
+                response.setStatus(200)
                 return u"dummy"
         
         provideAdapter(DummyInterceptor, name="interceptor")
@@ -422,11 +422,52 @@ class TestIntercept(unittest.TestCase):
             self.fail()
         except InterceptorControlFlowException, e:
             self.assertEquals(u"dummy", e.responseBody)
-            self.assertEquals("304", e.__class__.__name__)
+            self.assertEquals("OK", e.__class__.__name__)
         except Exception, e:
             self.fail(str(e))
             
         self.assertEquals({'PUBLISHED': resource.index_html}, dict(request))
+        self.assertEquals({'X-Cache-Rule': ['testrule'],
+                           'X-Cache-Interceptor': ['interceptor'],
+                           'X-Cache-Foo': ['test']}, dict(request.response))
+
+    def test_match_body_generated_exception(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        
+        z3c.caching.registry.register(DummyView, 'testrule')
+        settings.interceptorMapping = {'testrule': 'interceptor'}
+        
+        class DummyInterceptor(object):
+            implements(ICacheInterceptor)
+            adapts(Interface, Interface)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self, rulename, response):
+                response.addHeader('X-Cache-Foo', 'test')
+                response.setStatus(808)
+                return u"dummy"
+        
+        provideAdapter(DummyInterceptor, name="interceptor")
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        try:
+            intercept(DummyEvent(request))
+            self.fail()
+        except InterceptorControlFlowException, e:
+            self.assertEquals(u"dummy", e.responseBody)
+            self.assertEquals("808", e.__class__.__name__)
+        except Exception, e:
+            self.fail(str(e))
+            
+        self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Interceptor': ['interceptor'],
                            'X-Cache-Foo': ['test']}, dict(request.response))

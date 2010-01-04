@@ -42,10 +42,14 @@ def mutateResponse(event):
         logging.exception("Swallowed exception in plone.caching IPubBeforeCommit event handler")
     
 class InterceptorControlFlowException(Exception):
-    """Exception raised in order to abort regular processing and render a
-    specific response body instead. The actual exception raised will be a
-    subtype of this with a named indicating the HTTP status. Zope's
-    HTTPResponse uses the exception name to look up status.
+    """Exception raised in order to abort regular processing before the
+    published resource (e.g. a view) is called, and render a specific response
+    body and status provided by a cache interceptor instead.
+    
+    The actual exception raised will be a subtype of this, with a name
+    indicating the HTTP status. Zope's HTTPResponse uses the exception name to
+    look up the actual numeric status code. The new response body is set in
+    the ``responseBody`` variable.
     """
     
     responseBody = u""

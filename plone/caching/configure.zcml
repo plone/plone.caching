@@ -22,7 +22,7 @@
         <subscriber handler=".hooks.mutateResponse" />
         <browser:page
             name="index.html"
-            for=".hooks.InterceptorControlFlowException"
+            for=".hooks.Intercepted"
             class=".hooks.InterceptorResponse"
             permission="zope2.Public"
             />

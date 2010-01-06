@@ -41,64 +41,21 @@ def mutateResponse(event):
     except:
         logging.exception("Swallowed exception in plone.caching IPubBeforeCommit event handler")
     
-class InterceptorControlFlowException(Exception):
+class Intercepted(Exception):
     """Exception raised in order to abort regular processing before the
     published resource (e.g. a view) is called, and render a specific response
     body and status provided by a cache interceptor instead.
-    
-    The actual exception raised will be a subtype of this, with a name
-    indicating the HTTP status. Zope's HTTPResponse uses the exception name to
-    look up the actual numeric status code. The new response body is set in
-    the ``responseBody`` variable.
     """
     
-    responseBody = u""
-
-class OK(InterceptorControlFlowException):
-    pass
-
-class MovedPermanently(InterceptorControlFlowException):
-    pass
-
-class MovedTemporarily(InterceptorControlFlowException):
-    pass
-
-class NotModified(InterceptorControlFlowException):
-    pass
-
-class UseProxy(InterceptorControlFlowException):
-    pass
-
-class TemporaryRedirect(InterceptorControlFlowException):
-    pass
-
-class Unauthorized(InterceptorControlFlowException):
-    pass
-
-class Forbidden(InterceptorControlFlowException):
-    pass
-
-class NotFound(InterceptorControlFlowException):
-    pass
-
-class ProxyAuthenticationRequired(InterceptorControlFlowException):
-    pass
-
-status_exception_map = {
-    200: OK,
-    301: MovedPermanently,
-    302: MovedTemporarily,
-    304: NotModified,
-    305: UseProxy,
-    307: TemporaryRedirect,
-    401: Unauthorized,
-    403: Forbidden,
-    404: NotFound, 
-    407: ProxyAuthenticationRequired,
-}
+    responseBody = None
+    status = None
+    
+    def __init__(self, status=304, responseBody=u""):
+        self.status = status
+        self.responseBody = responseBody
 
 class InterceptorResponse(object):
-    """View for InterceptorControlFlowException, serving to return an empty
+    """View for the Intercepted exception, serving to return an empty
     response in the case of an intercepted response.
     """
     
@@ -140,24 +97,20 @@ def intercept(event):
         
             responseBody = interceptor(rulename, request.response)
             if responseBody is not None:
-                # Try to find a suitable exception
                 
-                status = event.request.response.getStatus()
-                exceptionType = status_exception_map.get(status, None)
-                if exceptionType is None:
-                    # If we can't find it, generate a class object with an
-                    # appropriate __name__. This will show up in the error
-                    # log and be generally confusing, but what the heck
-                    exceptionType = type(str(event.request.response.getStatus()),
-                           (InterceptorControlFlowException,), {})
+                # The view is liable to have set a response status. Lock it
+                # now so that it doesn't get set to 500 later.
                 
-                exception = exceptionType()
-                exception.responseBody = responseBody
-                raise exception
+                status = request.response.getStatus()
+                if not status:
+                    status = 304
+                
+                request.response.setStatus(status, lock=True)
+                raise Intercepted(status, responseBody)
     
     except ConflictError:
         raise
-    except InterceptorControlFlowException:
+    except Intercepted:
         raise
     except:
         logging.exception("Swallowed exception in plone.caching IPubAfterTraversal event handler")

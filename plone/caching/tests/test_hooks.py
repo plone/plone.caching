@@ -21,7 +21,7 @@ from plone.caching.interfaces import ICacheSettings
 from plone.caching.lookup import DefaultOperationLookup
 
 from plone.caching.hooks import mutateResponse, intercept
-from plone.caching.hooks import InterceptorControlFlowException
+from plone.caching.hooks import Intercepted
 
 class DummyView(object):
     pass
@@ -32,11 +32,15 @@ class DummyResource(object):
 
 class DummyResponse(dict):
     
+    locked = None
+    
     def addHeader(self, name, value):
         self.setdefault(name, []).append(value)
     
-    def setStatus(self, value):
+    def setStatus(self, value, lock=None):
         self.status = value
+        if lock is not None:
+            self.locked = lock
     def getStatus(self):
         return self.status
     
@@ -379,9 +383,11 @@ class TestIntercept(unittest.TestCase):
         try:
             intercept(DummyEvent(request))
             self.fail()
-        except InterceptorControlFlowException, e:
+        except Intercepted, e:
             self.assertEquals(u"dummy", e.responseBody)
-            self.assertEquals("NotModified", e.__class__.__name__)
+            self.assertEquals(304, e.status)
+            self.assertEquals(304, request.response.status)
+            self.assertEquals(True, request.response.locked)
         except Exception, e:
             self.fail(str(e))
             
@@ -420,9 +426,11 @@ class TestIntercept(unittest.TestCase):
         try:
             intercept(DummyEvent(request))
             self.fail()
-        except InterceptorControlFlowException, e:
+        except Intercepted, e:
             self.assertEquals(u"dummy", e.responseBody)
-            self.assertEquals("OK", e.__class__.__name__)
+            self.assertEquals(200, e.status)
+            self.assertEquals(200, request.response.status)
+            self.assertEquals(True, request.response.locked)
         except Exception, e:
             self.fail(str(e))
             
@@ -431,47 +439,6 @@ class TestIntercept(unittest.TestCase):
                            'X-Cache-Interceptor': ['interceptor'],
                            'X-Cache-Foo': ['test']}, dict(request.response))
 
-    def test_match_body_generated_exception(self):
-        provideUtility(Registry(), IRegistry)
-        registry = getUtility(IRegistry)
-        registry.registerInterface(ICacheSettings)
-        settings = registry.forInterface(ICacheSettings)
-        settings.enabled = True
-        
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.interceptorMapping = {'testrule': 'interceptor'}
-        
-        class DummyInterceptor(object):
-            implements(ICacheInterceptor)
-            adapts(Interface, Interface)
-            
-            def __init__(self, published, request):
-                self.published = published
-                self.request = request
-            
-            def __call__(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
-                response.setStatus(808)
-                return u"dummy"
-        
-        provideAdapter(DummyInterceptor, name="interceptor")
-        
-        view = DummyView()
-        request = DummyRequest(view, DummyResponse())
-        try:
-            intercept(DummyEvent(request))
-            self.fail()
-        except InterceptorControlFlowException, e:
-            self.assertEquals(u"dummy", e.responseBody)
-            self.assertEquals("808", e.__class__.__name__)
-        except Exception, e:
-            self.fail(str(e))
-            
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Interceptor': ['interceptor'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
-    
     def test_off_switch(self):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)

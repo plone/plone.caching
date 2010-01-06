@@ -22,15 +22,15 @@ class ICacheSettings(Interface):
     mutatorMapping = schema.Dict(
             title=_(u"Rule set/operation mapping"),
             description=_(u"Maps rule set names to request mutation operation names"),
-            key_type=schema.ASCIILine(title=_(u"Rule set name")),
-            value_type=schema.ASCIILine(title=_(u"Request mutator name")),
+            key_type=schema.DottedName(title=_(u"Rule set name")),
+            value_type=schema.DottedName(title=_(u"Request mutator name")),
         )
 
     interceptorMapping = schema.Dict(
             title=_(u"Rule set/interceptor mapping"),
             description=_(u"Maps rule set names to cache interceptor operation names"),
-            key_type=schema.ASCIILine(title=_(u"Rule set name")),
-            value_type=schema.ASCIILine(title=_(u"Interceptor name")),
+            key_type=schema.DottedName(title=_(u"Rule set name")),
+            value_type=schema.DottedName(title=_(u"Interceptor name")),
         )
 
 #

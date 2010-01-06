@@ -102,7 +102,7 @@ look like this::
 
         <cache:ruleset
             for=".frontpage.FrontpageView"
-            ruleset="plone-content-types"
+            ruleset="plone.contentTypes"
             />
 
         <browser:page
@@ -116,15 +116,20 @@ look like this::
     </configure>
 
 Here, the view implemented by the class ``FrontpageView`` is associated with
-the rule set ``plone-content-types``.
+the rule set ``plone.contentTypes``.
 
-Elsewhere (or in the same file) the ``plone-content-types`` ruleset should be
+**NOTE:** Ruleset names should be *dotted names*. That is, they should consist
+only of upper or lowercase letters, digits, underscores and/or periods (dots).
+The idea is that this forms a namespace similar to namespaces created by
+packages and modules in Python.
+
+Elsewhere (or in the same file) the ``plone.contentTypes`` ruleset should be
 declared with a title and description. This is can be used by a UI such as
 that provided by `plone.app.caching`_. If "explicit" mode is set in
 ``z3c.caching``, this is required. By default it is optional::
 
         <cache:rulesetType
-            name="plone-content-types"
+            name="plone.contentTypes"
             title="Plone content types"
             description="Non-container content types"
             />
@@ -142,11 +147,11 @@ Mapping cache rules to response mutators
 ----------------------------------------
 
 ``plone.caching`` maintains a mapping of rule sets to mutator operations in
-the registry. This mapping is stored in a dictionary of dotted name (ASCII)
-string keys to dotted name string values, under the record
+the registry. This mapping is stored in a dictionary of dotted name string
+keys to dotted name string values, under the record
 ``plone.caching.interfaces.ICacheSettings.mutatorMapping``.
 
-To set the name of the operation to use for the ``plone-content-types`` rule
+To set the name of the operation to use for the ``plone.contentTypes`` rule
 shown above, a mapping like the following might be used::
 
     from zope.component import getUtility
@@ -157,7 +162,7 @@ shown above, a mapping like the following might be used::
     settings = registry.forInterface(ICacheSettings)
     if settings.mutatorMapping is None: # initialise if not set already
         settings.mutatorMapping = {}
-    settings.mutatorMapping['plone-content-types'] = 'my.package.mymutator'
+    settings.mutatorMapping['plone.contentTypes'] = 'my.package.mymutator'
 
 Here, ``my.package.mymutator`` is the name of a caching mutator. We will
 see an example of using one shortly.
@@ -165,13 +170,13 @@ see an example of using one shortly.
 If you want to use several mutators, you can chain them together using the
 ``plone.caching.operations.chain`` mutator::
 
-    settings.mutatorMapping['plone-content-types'] = 'plone.caching.operations.chain'
+    settings.mutatorMapping['plone.contentTypes'] = 'plone.caching.operations.chain'
     
-    registry['plone.caching.operations.chain.plone-content-types.operations'] = \
+    registry['plone.caching.operations.chain.plone.contentTypes.operations'] = \
         ['my.package.mymutator', 'my.package.anothermutator']
 
 The last line here is setting the ``operations`` option for the chain
-mutator, in a way that is specific to the ``plone-content-types`` rule set.
+mutator, in a way that is specific to the ``plone.contentTypes`` rule set.
 More on the configuration syntax shortly.
 
 If you need to list all response mutators for UI purposes, you can look up
@@ -231,8 +236,8 @@ defaults).
 
 If you need to change these settings on a per-cache-rule basis, you can do
 so by inserting the cache rule name between the prefix and the option name.
-For example, for the cache rule ``my-rule``, the rule-specific version of
-``option1`` would be ``my.package.mymutator.my-rule.option1``.
+For example, for the cache rule ``my.rule``, the rule-specific version of
+``option1`` would be ``my.package.mymutator.my.rule.option1``.
 
 Finally, note that it is generally safe to use caching operations if their
 registry keys are not installed. That is, they should fall back on sensible

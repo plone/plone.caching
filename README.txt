@@ -295,7 +295,7 @@ HTTP request (but not other types of request.)::
         def __call__(self, rulename, response):
             options = lookupOptions(self.__class__, rulename)
             maxAge = options['maxAge'] or 3600
-            response.setHeader('Cache-Control', 'max-age=3600, must-revalidate' % maxAge)
+            response.setHeader('Cache-Control', 'max-age=%s, must-revalidate' % maxAge)
 
 Note the use of the ``lookupOptions()`` helper method. You can pass this
 either a ``IResponseMutatorType`` (or ``ICacheInterceptorType``) instance,

@@ -72,7 +72,7 @@ class TestLookupResponseMutator(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertEquals((None, None, None,),
+        self.assertEquals(('testrule', None, None,),
                 DefaultOperationLookup(view, request).getResponseMutator())
     
     def test_getResponseMutator_operation_not_found(self):
@@ -188,7 +188,7 @@ class TestLookupCacheInterceptor(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        self.assertEquals((None, None, None,),
+        self.assertEquals(('testrule', None, None,),
                 DefaultOperationLookup(view, request).getCacheInterceptor())
     
     def test_getCacheInterceptor_operation_not_found(self):

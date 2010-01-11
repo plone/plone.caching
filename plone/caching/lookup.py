@@ -40,11 +40,11 @@ class DefaultOperationLookup(object):
             return None, None, None
     
         if settings.mutatorMapping is None:
-            return None, None, None
+            return rule, None, None
     
         name = settings.mutatorMapping.get(rule, None)
         if name is None:
-            return None, None, None
+            return rule, None, None
     
         mutator = queryMultiAdapter((self.published, self.request), IResponseMutator, name=name)
         return rule, name, mutator
@@ -61,14 +61,14 @@ class DefaultOperationLookup(object):
     
         rule = lookup(self.published)
         if rule is None:
-            return None, None, None
+            return rule, None, None
     
         if settings.interceptorMapping is None:
-            return None, None, None
+            return rule, None, None
     
         name = settings.interceptorMapping.get(rule, None)
         if name is None:
-            return None, None, None
+            return rule, None, None
     
         interceptor = queryMultiAdapter((self.published, self.request), ICacheInterceptor, name=name)
         return rule, name, interceptor

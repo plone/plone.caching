@@ -30,6 +30,8 @@ def mutateResponse(event):
         lookup = queryMultiAdapter((published, request,), IOperationLookup)
         rulename, operation, mutator = lookup.getResponseMutator()
         
+        logger.debug("Published: %s Ruleset: %s Mutator: %s", repr(published), rulename, operation)
+        
         if mutator is not None:
         
             request.response.addHeader(X_CACHE_RULE_HEADER, rulename)
@@ -89,6 +91,8 @@ def intercept(event):
         
         lookup = queryMultiAdapter((published, request,), IOperationLookup)
         rulename, operation, interceptor = lookup.getCacheInterceptor()
+        
+        logger.debug("Published: %s Ruleset: %s Interceptor: %s", repr(published), rulename, operation)
         
         if interceptor is not None:
         

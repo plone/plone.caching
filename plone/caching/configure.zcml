@@ -10,7 +10,7 @@
     <include package="plone.registry" />
     
     <!-- Default lookup -->
-    <adapter factory=".lookup.DefaultOperationLookup" />
+    <adapter factory=".lookup.DefaultRulesetLookup" />
     
     <!-- The 'Chain' response mutator -->
     <adapter factory=".operations.Chain"   name="plone.caching.operations.chain" />

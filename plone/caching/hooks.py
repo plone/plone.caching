@@ -1,14 +1,20 @@
 import types
 import logging
 
-from zope.component import adapter, queryMultiAdapter
+from zope.component import adapter, queryMultiAdapter, queryUtility
 
 from ZPublisher.interfaces import IPubBeforeCommit, IPubAfterTraversal
 from ZODB.POSException import ConflictError
 
+from plone.registry.interfaces import IRegistry
+
 from plone.caching.interfaces import X_CACHE_RULE_HEADER
 from plone.caching.interfaces import X_MUTATOR_HEADER, X_INTERCEPTOR_HEADER
-from plone.caching.interfaces import IOperationLookup
+
+from plone.caching.interfaces import ICacheSettings
+from plone.caching.interfaces import IRulesetLookup
+from plone.caching.interfaces import IResponseMutator
+from plone.caching.interfaces import ICacheInterceptor
 
 logger = logging.getLogger('plone.caching')
 
@@ -27,17 +33,38 @@ def mutateResponse(event):
         if isinstance(published, types.MethodType):
             published = getattr(published, 'im_self', published)
         
-        lookup = queryMultiAdapter((published, request,), IOperationLookup)
-        rulename, operation, mutator = lookup.getResponseMutator()
+        registry = queryUtility(IRegistry)
+        if registry is None:
+            return
         
-        logger.debug("Published: %s Ruleset: %s Mutator: %s", repr(published), rulename, operation)
+        settings = registry.forInterface(ICacheSettings, check=False)
+        if not settings.enabled:
+            return
+        
+        if settings.mutatorMapping is None:
+            return
+        
+        lookup = queryMultiAdapter((published, request,), IRulesetLookup)
+        if lookup is None:
+            return
+        
+        # From this point, we want to at least log
+        rule = lookup()
+        operation = None
+        mutator = None
+        
+        if rule is not None:
+            operation = settings.mutatorMapping.get(rule, None)
+            if operation is not None:
+                mutator = queryMultiAdapter((published, request), IResponseMutator, name=operation)
+        
+        logger.debug("Published: %s Ruleset: %s Mutator: %s", repr(published), rule, operation)
         
         if mutator is not None:
-        
-            request.response.addHeader(X_CACHE_RULE_HEADER, rulename)
+            request.response.addHeader(X_CACHE_RULE_HEADER, rule)
             request.response.addHeader(X_MUTATOR_HEADER, operation)
+            mutator(rule, request.response)
         
-            mutator(rulename, request.response)
     except ConflictError:
         raise
     except:
@@ -89,17 +116,39 @@ def intercept(event):
         if isinstance(published, types.MethodType):
             published = getattr(published, 'im_self', published)
         
-        lookup = queryMultiAdapter((published, request,), IOperationLookup)
-        rulename, operation, interceptor = lookup.getCacheInterceptor()
+        registry = queryUtility(IRegistry)
+        if registry is None:
+            return
         
-        logger.debug("Published: %s Ruleset: %s Interceptor: %s", repr(published), rulename, operation)
+        settings = registry.forInterface(ICacheSettings, check=False)
+        if not settings.enabled:
+            return
+        
+        if settings.interceptorMapping is None:
+            return
+        
+        lookup = queryMultiAdapter((published, request,), IRulesetLookup)
+        if lookup is None:
+            return
+        
+        # From this point, we want to at least log
+        rule = lookup()
+        operation = None
+        interceptor = None
+        
+        if rule is not None:
+            operation = settings.interceptorMapping.get(rule, None)
+            if operation is not None:
+                interceptor = queryMultiAdapter((published, request), ICacheInterceptor, name=operation)
+        
+        logger.debug("Published: %s Ruleset: %s Interceptor: %s", repr(published), rule, operation)
         
         if interceptor is not None:
         
-            request.response.addHeader(X_CACHE_RULE_HEADER, rulename)
+            request.response.addHeader(X_CACHE_RULE_HEADER, rule)
             request.response.addHeader(X_INTERCEPTOR_HEADER, operation)
-        
-            responseBody = interceptor(rulename, request.response)
+            responseBody = interceptor(rule, request.response)
+            
             if responseBody is not None:
                 
                 # The view is liable to have set a response status. Lock it
@@ -118,3 +167,5 @@ def intercept(event):
         raise
     except:
         logging.exception("Swallowed exception in plone.caching IPubAfterTraversal event handler")
+
+

@@ -20,7 +20,8 @@ from plone.caching.interfaces import ICacheSettings
 
 from plone.caching.lookup import DefaultRulesetLookup
 
-from plone.caching.hooks import mutateResponse, intercept
+from plone.caching.hooks import MutatorTransform
+from plone.caching.hooks import intercept
 from plone.caching.hooks import Intercepted
 
 class DummyView(object):
@@ -48,7 +49,7 @@ class DummyRequest(dict):
     def __init__(self, published, response):
         self['PUBLISHED'] = published
         self.response = response
-
+    
 class DummyEvent(object):
     def __init__(self, request):
         self.request = request
@@ -72,7 +73,8 @@ class TestMutateResponse(unittest.TestCase):
         
         request = DummyRequest(None, DummyResponse())
         
-        mutateResponse(DummyEvent(request))
+        MutatorTransform(None, request).transformUnicode(u"", "utf-8")
+        
         self.assertEquals({'PUBLISHED': None}, dict(request))
         self.assertEquals({}, dict(request.response))
     
@@ -80,7 +82,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         
-        mutateResponse(DummyEvent(request))
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
         
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
@@ -90,7 +92,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         
-        mutateResponse(DummyEvent(request))
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
         
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
@@ -104,7 +106,9 @@ class TestMutateResponse(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        mutateResponse(DummyEvent(request))
+        
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
         
@@ -119,7 +123,9 @@ class TestMutateResponse(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        mutateResponse(DummyEvent(request))
+        
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
     
@@ -135,11 +141,13 @@ class TestMutateResponse(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        mutateResponse(DummyEvent(request))
+        
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
     
-    def test_match(self):
+    def test_match_unicode(self):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -164,11 +172,111 @@ class TestMutateResponse(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        mutateResponse(DummyEvent(request))
+        
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Mutator': ['mutator'],
                            'X-Cache-Foo': ['test']}, dict(request.response))
+    
+    def test_match_bytes(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        
+        z3c.caching.registry.register(DummyView, 'testrule')
+        settings.mutatorMapping = {'testrule': 'mutator'}
+        
+        class DummyMutator(object):
+            implements(IResponseMutator)
+            adapts(Interface, Interface)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self, rulename, response):
+                response.addHeader('X-Cache-Foo', 'test')
+        
+        provideAdapter(DummyMutator, name="mutator")
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        
+        MutatorTransform(view, request).transformBytes("", "utf-8")
+        
+        self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({'X-Cache-Rule': ['testrule'],
+                           'X-Cache-Mutator': ['mutator'],
+                           'X-Cache-Foo': ['test']}, dict(request.response))
+    
+    def test_match_iterable(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        
+        z3c.caching.registry.register(DummyView, 'testrule')
+        settings.mutatorMapping = {'testrule': 'mutator'}
+        
+        class DummyMutator(object):
+            implements(IResponseMutator)
+            adapts(Interface, Interface)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self, rulename, response):
+                response.addHeader('X-Cache-Foo', 'test')
+        
+        provideAdapter(DummyMutator, name="mutator")
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        
+        MutatorTransform(view, request).transformIterable([""], "utf-8")
+        
+        self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({'X-Cache-Rule': ['testrule'],
+                           'X-Cache-Mutator': ['mutator'],
+                           'X-Cache-Foo': ['test']}, dict(request.response))
+    
+    def test_match_intercepted(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        
+        z3c.caching.registry.register(DummyView, 'testrule')
+        settings.mutatorMapping = {'testrule': 'mutator'}
+        
+        class DummyMutator(object):
+            implements(IResponseMutator)
+            adapts(Interface, Interface)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self, rulename, response):
+                response.addHeader('X-Cache-Foo', 'test')
+        
+        provideAdapter(DummyMutator, name="mutator")
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        request['plone.caching.intercepted'] = True
+        
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        
+        self.assertEquals({'PUBLISHED': view, 'plone.caching.intercepted': True}, dict(request))
+        self.assertEquals({}, dict(request.response))
     
     def test_match_method(self):
         provideUtility(Registry(), IRegistry)
@@ -195,7 +303,9 @@ class TestMutateResponse(unittest.TestCase):
         
         resource = DummyResource()
         request = DummyRequest(resource.index_html, DummyResponse())
-        mutateResponse(DummyEvent(request))
+        
+        MutatorTransform(resource, request).transformUnicode(u"", "utf-8")
+        
         self.assertEquals({'PUBLISHED': resource.index_html}, dict(request))
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Mutator': ['mutator'],
@@ -226,7 +336,9 @@ class TestMutateResponse(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        mutateResponse(DummyEvent(request))
+        
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
 
@@ -347,8 +459,9 @@ class TestIntercept(unittest.TestCase):
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
+        
         intercept(DummyEvent(request))
-        self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({'PUBLISHED': view, 'plone.caching.intercepted': True}, dict(request))
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Interceptor': ['interceptor'],
                            'X-Cache-Foo': ['test']}, dict(request.response))
@@ -391,7 +504,7 @@ class TestIntercept(unittest.TestCase):
         except Exception, e:
             self.fail(str(e))
             
-        self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({'PUBLISHED': view, 'plone.caching.intercepted': True}, dict(request))
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Interceptor': ['interceptor'],
                            'X-Cache-Foo': ['test']}, dict(request.response))
@@ -434,7 +547,8 @@ class TestIntercept(unittest.TestCase):
         except Exception, e:
             self.fail(str(e))
             
-        self.assertEquals({'PUBLISHED': resource.index_html}, dict(request))
+        self.assertEquals({'PUBLISHED': resource.index_html, 'plone.caching.intercepted': True},
+                          dict(request))
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Interceptor': ['interceptor'],
                            'X-Cache-Foo': ['test']}, dict(request.response))

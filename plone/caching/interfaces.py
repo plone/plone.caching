@@ -47,7 +47,11 @@ class IResponseMutator(Interface):
     def __call__(ruleset, response):
         """Mutate the response. ``rulset`` is the name of the caching ruleset
         that was matched. It may be ``None``. ``response`` is the current
-        HTTP response.
+        HTTP response. You may modify its headers and inspect it as required.
+        
+        The response body should *not* be modified. If you need to do that,
+        either use ``plone.transformchain`` to add a new transformer, or use
+        a cache interceptor.
         """
 
 class ICacheInterceptor(Interface):
@@ -66,6 +70,8 @@ class ICacheInterceptor(Interface):
         
         ``rulset`` is the name of the caching ruleset that was matched. It may
         be ``None``. ``response`` is the current HTTP response.
+        
+        The response body should *not* be modified.
         """
 
 #

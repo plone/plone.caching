@@ -8,6 +8,7 @@
     <include package="z3c.caching" />
     
     <include package="plone.registry" />
+    <include package="plone.transformchain" />
     
     <!-- Default lookup -->
     <adapter factory=".lookup.DefaultRulesetLookup" />
@@ -16,18 +17,19 @@
     <adapter factory=".operations.Chain"   name="plone.caching.operations.chain" />
     <utility component=".operations.Chain" name="plone.caching.operations.chain" />
     
-    <configure zcml:condition="installed ZPublisher.interfaces">
-        
-        <subscriber handler=".hooks.intercept" />
-        <subscriber handler=".hooks.mutateResponse" />
-        <browser:page
-            name="index.html"
-            for=".hooks.Intercepted"
-            class=".hooks.InterceptorResponse"
-            permission="zope2.Public"
-            />
-        
-    </configure>
+    <!-- Interceptor: Performed by raising an exception prior to view
+         invocation. There is a view on this exception which renders the
+         intercepted response.
+     -->
+    <subscriber handler=".hooks.intercept" />
+    <browser:page
+        name="index.html"
+        for=".hooks.Intercepted"
+        class=".hooks.InterceptorResponse"
+        permission="zope2.Public"
+        />
     
+    <!-- Mutator: plone.transformchain order 12000 -->
+    <adapter factory=".hooks.MutatorTransform" name="plone.caching.mutator" />
     
 </configure>

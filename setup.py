@@ -31,6 +31,7 @@ setup(name='plone.caching',
           'zope.component',
           'zope.i18nmessageid',
           'zope.schema',
+          'plone.transformchain',
       ],
       entry_points="""
       # -*- Entry points: -*-

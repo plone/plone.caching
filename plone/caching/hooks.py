@@ -114,7 +114,8 @@ def intercept(event):
                     request.response.setStatus(status, lock=True)
                 
                 # Stop any post-processing
-                request.environ[DISABLE_TRANSFORM_REQUEST_KEY] = True
+                if DISABLE_TRANSFORM_REQUEST_KEY not in request.environ:
+                    request.environ[DISABLE_TRANSFORM_REQUEST_KEY] = True
                 
                 raise Intercepted(status, responseBody)
     

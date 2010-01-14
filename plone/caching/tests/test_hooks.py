@@ -510,6 +510,51 @@ class TestIntercept(unittest.TestCase):
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Interceptor': ['interceptor'],
                            'X-Cache-Foo': ['test']}, dict(request.response))
+
+    def test_match_body_explicitly_enable_transform_chain(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        
+        z3c.caching.registry.register(DummyView, 'testrule')
+        settings.interceptorMapping = {'testrule': 'interceptor'}
+        
+        class DummyInterceptor(object):
+            implements(ICacheInterceptor)
+            adapts(Interface, Interface)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self, rulename, response):
+                response.addHeader('X-Cache-Foo', 'test')
+                response.setStatus(304)
+                self.request.environ['plone.transformchain.disable'] = False
+                return u"dummy"
+        
+        provideAdapter(DummyInterceptor, name="interceptor")
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        try:
+            intercept(DummyEvent(request))
+            self.fail()
+        except Intercepted, e:
+            self.assertEquals(u"dummy", e.responseBody)
+            self.assertEquals(304, e.status)
+            self.assertEquals(304, request.response.status)
+            self.assertEquals(True, request.response.locked)
+        except Exception, e:
+            self.fail(str(e))
+            
+        self.assertEquals({'PUBLISHED': view, 'plone.caching.intercepted': True}, dict(request))
+        self.assertEquals({'plone.transformchain.disable': False}, request.environ)
+        self.assertEquals({'X-Cache-Rule': ['testrule'],
+                           'X-Cache-Interceptor': ['interceptor'],
+                           'X-Cache-Foo': ['test']}, dict(request.response))
     
     def test_match_body_method(self):
         provideUtility(Registry(), IRegistry)

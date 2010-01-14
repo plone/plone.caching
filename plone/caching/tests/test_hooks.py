@@ -49,6 +49,7 @@ class DummyRequest(dict):
     def __init__(self, published, response):
         self['PUBLISHED'] = published
         self.response = response
+        self.environ = {}
     
 class DummyEvent(object):
     def __init__(self, request):
@@ -505,6 +506,7 @@ class TestIntercept(unittest.TestCase):
             self.fail(str(e))
             
         self.assertEquals({'PUBLISHED': view, 'plone.caching.intercepted': True}, dict(request))
+        self.assertEquals({'plone.transformchain.disable': True}, request.environ)
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Interceptor': ['interceptor'],
                            'X-Cache-Foo': ['test']}, dict(request.response))
@@ -547,8 +549,8 @@ class TestIntercept(unittest.TestCase):
         except Exception, e:
             self.fail(str(e))
             
-        self.assertEquals({'PUBLISHED': resource.index_html, 'plone.caching.intercepted': True},
-                          dict(request))
+        self.assertEquals({'PUBLISHED': resource.index_html, 'plone.caching.intercepted': True}, dict(request))
+        self.assertEquals({'plone.transformchain.disable': True}, request.environ)
         self.assertEquals({'X-Cache-Rule': ['testrule'],
                            'X-Cache-Interceptor': ['interceptor'],
                            'X-Cache-Foo': ['test']}, dict(request.response))

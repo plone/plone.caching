@@ -12,6 +12,7 @@ from ZODB.POSException import ConflictError
 from plone.registry.interfaces import IRegistry
 
 from plone.transformchain.interfaces import ITransform
+from plone.transformchain.interfaces import DISABLE_TRANSFORM_REQUEST_KEY
 
 from plone.caching.interfaces import X_CACHE_RULE_HEADER
 from plone.caching.interfaces import X_MUTATOR_HEADER, X_INTERCEPTOR_HEADER
@@ -112,6 +113,9 @@ def intercept(event):
                 if status:
                     request.response.setStatus(status, lock=True)
                 
+                # Stop any post-processing
+                request.environ[DISABLE_TRANSFORM_REQUEST_KEY] = True
+                
                 raise Intercepted(status, responseBody)
     
     except ConflictError:
@@ -202,3 +206,4 @@ class MutatorTransform(object):
             request.response.addHeader(X_CACHE_RULE_HEADER, rule)
             request.response.addHeader(X_MUTATOR_HEADER, operation)
             mutator(rule, request.response)
+

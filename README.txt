@@ -273,7 +273,8 @@ HTTP request (but not other types of request.)::
     
     from plone.caching.interfaces import IResponseMutator
     from plone.caching.interfaces import IResponseMutatorType
-    
+    from plone.caching.interfaces import _    
+
     from plone.caching.utils import lookupOptions
 
     class MaxAge(object):
@@ -333,11 +334,12 @@ is probably not very useful, but it serves as an example.)::
     
     from plone.caching.interfaces import ICacheInterceptor
     from plone.caching.interfaces import ICacheInterceptorType
+    from plone.caching.interfaces import _ 
     
     from plone.caching.utils import lookupOptions
 
     class Always304(object):
-        implements(IResponseMutator)
+        implements(ICacheInterceptor)
         adapts(Interface, IHTTPRequest)
     
         # Type metadata

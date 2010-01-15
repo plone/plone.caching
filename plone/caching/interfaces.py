@@ -5,9 +5,8 @@ from zope import schema
 
 _ = zope.i18nmessageid.MessageFactory('plone.caching')
 
-X_CACHE_RULE_HEADER  = 'X-Cache-Rule'
-X_MUTATOR_HEADER     = 'X-Cache-Mutator'
-X_INTERCEPTOR_HEADER = 'X-Cache-Interceptor'
+X_CACHE_RULE_HEADER      = 'X-Cache-Rule'
+X_CACHE_OPERATION_HEADER = 'X-Cache-Operation'
 
 class ICacheSettings(Interface):
     """Settings expected to be found in plone.registry
@@ -19,54 +18,33 @@ class ICacheSettings(Interface):
             default=False,
         )
     
-    mutatorMapping = schema.Dict(
+    operationMapping = schema.Dict(
             title=_(u"Rule set/operation mapping"),
-            description=_(u"Maps rule set names to request mutation operation names"),
+            description=_(u"Maps rule set names to operation names"),
             key_type=schema.DottedName(title=_(u"Rule set name")),
-            value_type=schema.DottedName(title=_(u"Request mutator name")),
-        )
-
-    interceptorMapping = schema.Dict(
-            title=_(u"Rule set/interceptor mapping"),
-            description=_(u"Maps rule set names to cache interceptor operation names"),
-            key_type=schema.DottedName(title=_(u"Rule set name")),
-            value_type=schema.DottedName(title=_(u"Interceptor name")),
+            value_type=schema.DottedName(title=_(u"Caching operation name")),
         )
 
 #
 #  Cache operations
 # 
 
-class IResponseMutator(Interface):
-    """Represents a caching operation, typically setting of response headers.
+class ICachingOperation(Interface):
+    """Represents a caching operation, typically setting of response headers
+    and/or returning of an intercepted response.
     
     Should be registered as a named multi-adapter from a cacheable object
     (e.g. a view, or just Interface for a general operation) and the request.
     """
-    
-    def __call__(ruleset, response):
-        """Mutate the response. ``rulset`` is the name of the caching ruleset
-        that was matched. It may be ``None``. ``response`` is the current
-        HTTP response. You may modify its headers and inspect it as required.
-        
-        The response body should *not* be modified. If you need to do that,
-        either use ``plone.transformchain`` to add a new transformer, or use
-        a cache interceptor.
-        """
 
-class ICacheInterceptor(Interface):
-    """Represents a caching intercept, typically for the purposes of sending
-    a 304 response.
-    
-    Should be registered as a named multi-adapter from a cacheable object
-    (e.g. a view, or just Interface for a general operation) and the request.
-    """
-    
-    def __call__(ruleset, response):
-        """Mutate the response if required, e.g. by setting headers. Return
-        None if the request should *not* be interrupted. Otherwise, return
-        a new response body as a unicode string. For simple 304 responses,
-        returning ``u""`` will suffice.
+    def interceptResponse(ruleset, response):
+        """Intercept the response if appropriate.
+        
+        May modify the response if required, e.g. by setting headers.
+        
+        Return None if the request should *not* be interrupted. Otherwise,
+        return a new response body as a unicode string. For simple 304
+        responses, returning ``u""`` will suffice.
         
         ``rulset`` is the name of the caching ruleset that was matched. It may
         be ``None``. ``response`` is the current HTTP response.
@@ -74,13 +52,67 @@ class ICacheInterceptor(Interface):
         The response body should *not* be modified.
         """
 
+    
+    def modifyResponse(ruleset, response):
+        """Modify the response. ``rulset`` is the name of the caching ruleset
+        that was matched. It may be ``None``. ``response`` is the current
+        HTTP response. You may modify its headers and inspect it as required.
+        
+        The response body should *not* be modified. If you need to do that,
+        either use ``plone.transformchain`` to add a new transformer, or use
+        the ``interceptResponse()`` method.
+        """
+
+
 #
 # Cache operation *types* (for UI support)
 # 
 
-class ICacheOperationType(Interface):
-    """Base interface for IResponseMutatorType and ICacheInterceptorType -
-    see below
+class ICachingOperationType(Interface):
+    """A named utility which is used to provide UI support for caching
+    operations. The name should correspond to the operation adapter name.
+    
+    The usual pattern is::
+    
+        from zope.interface import implements, classProvides, Interface
+        from zope.component import adapts
+    
+        from plone.caching.interfaces import ICachingOperation
+        from plone.caching.interfaces import ICachingOperationType
+        
+        from plone.caching.utils import lookupOptions
+        
+        class SomeOperation(object):
+            implements(ICachingOperation)
+            adapts(Interface, Interface)
+            
+            classProvides(ICachingOperationType)
+            title = u"Some operation"
+            description = u"Operation description"
+            prefix = 'my.package.operation1'
+            options = ('option1', 'option2')
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self, rulename, response):
+                options = lookupOptions(SomeOperation, rulename)
+                ...
+        
+    This defines an adapter factory (the class), which itself provides
+    information about the type of operation. In ZCML, these would be
+    registered with::
+        
+        <adapter factory=".ops.SomeOperation" name="my.package.operation1" />
+        <utility component=".ops.SomeOperation" name="my.package.operation1" />
+    
+    Note that the use of *component* for the ``<utility />`` registration - we
+    are registering the class as a utility. Also note that the utility and
+    adapter names must match. By convention, the option prefix should be the
+    same as the adapter/utility name.
+    
+    You could also register an instance as a utility, of course.
     """
     
     title = schema.TextLine(
@@ -115,57 +147,6 @@ class ICacheOperationType(Interface):
             required=False,
         )
     
-class IResponseMutatorType(ICacheOperationType):
-    """A named utility which is used to provide UI support for response
-    mutators. The name should correspond to the mutator adapter name.
-    
-    The usual pattern is::
-    
-        from zope.interface import implements, classProvides, Interface
-        from zope.component import adapts
-    
-        from plone.caching.interfaces import IResponseMutator
-        from plone.caching.interfaces import IResponseMutatorType
-        
-        from plone.caching.utils import lookupOptions
-        
-        class SomeMutator(object):
-            implements(IResponseMutator)
-            adapts(Interface, Interface)
-            classProvides(IResponseMutatorType)
-            
-            title = u"Some mutator"
-            description = u"Mutator description"
-            prefix = 'my.package.somemutator'
-            options = ('option1', 'option2')
-            
-            def __init__(self, published, request):
-                self.published = published
-                self.request = request
-            
-            def __call__(self, rulename, response):
-                options = lookupOptions(self.__class__, rulename)
-                ...
-        
-    This defines an adapter factory (the class), which itself provides
-    information about the type of mutator. In ZCML, these would be registered
-    with::
-        
-        <adapter factory=".mutator.SomeMutator" name="my.package.somemutator" />
-        <utility component=".mutator.SomeMutator" name="my.package.somemutator" />
-    
-    Note that the use of *component* for the ``<utility />`` registration - we
-    are registering the class as a utility. Also note that the utility and
-    adapter names must match. By convention, the option prefix should be the
-    same as the adapter/utility name.
-    
-    You could also register an instance as a utility, of course.
-    """
-
-class ICacheInterceptorType(ICacheOperationType):
-    """``ICacheInterceptor`` equivalent of ``IResponseMutatorType`` - see
-    above.
-    """
 
 #
 # Internal abstractions
@@ -187,8 +168,7 @@ class IRulesetLookup(Interface):
     """
     
     def __call__():
-        """Get the ruleset mutator for the adapted published object and
-        request.
+        """Get the ruleset for the adapted published object and request.
         
         Returns a ruleset name (a string) or None.
         """

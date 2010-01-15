@@ -9,7 +9,7 @@ from plone.registry.interfaces import IRegistry
 from plone.registry import Registry, Record
 from plone.registry import field
 
-from plone.caching.interfaces import IResponseMutatorType
+from plone.caching.interfaces import ICachingOperationType
 from plone.caching.utils import lookupOption, lookupOptions
 
 _marker = object()
@@ -56,7 +56,7 @@ class TestLookupOptions(unittest.TestCase):
     def test_lookupOptions_no_registry(self):
         
         class DummyOperation(object):
-            classProvides(IResponseMutatorType)
+            classProvides(ICachingOperationType)
             
             title = u""
             description = u""
@@ -70,7 +70,7 @@ class TestLookupOptions(unittest.TestCase):
         provideUtility(Registry(), IRegistry)
         
         class DummyOperation(object):
-            classProvides(IResponseMutatorType)
+            classProvides(ICachingOperationType)
             
             title = u""
             description = u""
@@ -87,7 +87,7 @@ class TestLookupOptions(unittest.TestCase):
         registry.records['plone.caching.tests.test2'] = Record(field.TextLine(), u"foo")
         
         class DummyOperation(object):
-            classProvides(IResponseMutatorType)
+            classProvides(ICachingOperationType)
             
             title = u""
             description = u""
@@ -106,7 +106,7 @@ class TestLookupOptions(unittest.TestCase):
         registry.records['plone.caching.tests.testrule.test2'] = Record(field.TextLine(), u"baz")
         
         class DummyOperation(object):
-            classProvides(IResponseMutatorType)
+            classProvides(ICachingOperationType)
             
             title = u""
             description = u""
@@ -123,7 +123,7 @@ class TestLookupOptions(unittest.TestCase):
         registry.records['plone.caching.tests.test2'] = Record(field.TextLine(), u"foo")
         
         class DummyOperation(object):
-            classProvides(IResponseMutatorType)
+            classProvides(ICachingOperationType)
             
             title = u""
             description = u""

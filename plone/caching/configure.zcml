@@ -13,11 +13,11 @@
     <!-- Default lookup -->
     <adapter factory=".lookup.DefaultRulesetLookup" />
     
-    <!-- The 'Chain' response mutator -->
+    <!-- The 'Chain' operation -->
     <adapter factory=".operations.Chain"   name="plone.caching.operations.chain" />
     <utility component=".operations.Chain" name="plone.caching.operations.chain" />
     
-    <!-- Interceptor: Performed by raising an exception prior to view
+    <!-- Intercepts are performed by raising an exception prior to view
          invocation. There is a view on this exception which renders the
          intercepted response.
      -->

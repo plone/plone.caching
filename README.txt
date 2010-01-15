@@ -4,35 +4,34 @@ plone.caching
 This package provides a framework for the management of cache headers, built
 atop `z3c.caching`_. It consists of the following elements:
 
-* An interface ``IResponseMutator``, describing components which mutate the
-  response for caching purposes. The most common operation will be to set
-  cache headers. Response mutators are named multi-adapters on the published
-  object (e.g. a view) and the request.
-  
-* An interface ``ICacheInterceptor``, describing components which intercept
-  a request before view rendering (but after traversal and authorisation)
-  to provide a cached response. The most common operation will be to set a
-  "304 Not Modified" response header and return an empty response, although it
-  is also possible to provide a full response body. Cache interceptors are
-  named multi-adapters on the published object (e.g. a view) and the request.
+* An interface ``ICachingOperation``, describing components which:
 
-* Two interfaces, ``IResponseMutatorType`` and ``ICacheInterceptorType``,
-  which are used for utilities describing response mutators and cache
-  interceptors, respectively.
+    * Modify the response for caching purposes. The most common operation will
+      be to set cache headers.
+    * Intercept a request before view rendering (but after traversal and
+      authorisation) to provide a cached response. The most common operation
+      will be to set a "304 Not Modified" response header and return an empty
+      response, although it is also possible to provide a full response body.
+  
+  Caching operations are named multi-adapters on the published object (e.g. a
+  view) and the request.
+  
+* An interfaces ``ICachingOperationType`` which is used for utilities
+  describing caching operations. This is mainly for UI purposes, although this
+  package does not provide any UI of its own.
 
 * Hooks into the Zope 2 ZPublisher (installed provided ZPublisher is
-  available) which will execute response mutators and cache interceptors as
-  appropriate.
+  available) which will execute caching operations as appropriate.
 
-* Helper functions for looking up configuration options for response mutators
-  and cache interceptors in a registry managed by `plone.registry`_
+* Helper functions for looking up configuration options caching operations in
+  a registry managed by `plone.registry`_
 
-* A response mutator called ``plone.caching.operations.chain``, which can
-  be used to chain together multiple response mutators. It will look up the
-  option ``plone.caching.operations.chain.${rulename}.operations`` in the
-  registry, expecting a list of strings indicating the names of response
-  mutators to execute. (${rulename} refers to the name of the caching rule
-  set in use - more on this later).
+* An operation called ``plone.caching.operations.chain``, which can be used to
+  chain together multiple operations. It will look up the option
+  ``plone.caching.operations.chain.${rulename}.operations`` in the
+  registry, expecting a list of strings indicating the names of operations to
+  execute. (${rulename} refers to the name of the caching rule set in use -
+  more on this later).
 
 Usage
 ~~~~~
@@ -143,13 +142,13 @@ Hints:
 * If you need to modify rule sets declared by packages not under your control,
   you can use an ``overrides.zcml`` file for your project.
 
-Mapping cache rules to response mutators
-----------------------------------------
+Mapping cache rules to operations
+---------------------------------
 
-``plone.caching`` maintains a mapping of rule sets to mutator operations in
+``plone.caching`` maintains a mapping of rule sets to caching operations in
 the registry. This mapping is stored in a dictionary of dotted name string
 keys to dotted name string values, under the record
-``plone.caching.interfaces.ICacheSettings.mutatorMapping``.
+``plone.caching.interfaces.ICacheSettings.operationMapping``.
 
 To set the name of the operation to use for the ``plone.contentTypes`` rule
 shown above, a mapping like the following might be used::
@@ -160,76 +159,64 @@ shown above, a mapping like the following might be used::
     
     registry = getUtility(IRegistry)
     settings = registry.forInterface(ICacheSettings)
-    if settings.mutatorMapping is None: # initialise if not set already
-        settings.mutatorMapping = {}
-    settings.mutatorMapping['plone.contentTypes'] = 'my.package.mymutator'
+    if settings.operationMapping is None: # initialise if not set already
+        settings.operationMapping = {}
+    settings.operationMapping['plone.contentTypes'] = 'my.package.operation'
 
-Here, ``my.package.mymutator`` is the name of a caching mutator. We will
+Here, ``my.package.operation`` is the name of a caching operation. We will
 see an example of using one shortly.
 
-If you want to use several mutators, you can chain them together using the
-``plone.caching.operations.chain`` mutator::
+If you want to use several operations, you can chain them together using the
+``plone.caching.operations.chain`` operation::
 
-    settings.mutatorMapping['plone.contentTypes'] = 'plone.caching.operations.chain'
+    settings.operationMapping['plone.contentTypes'] = 'plone.caching.operations.chain'
     
     registry['plone.caching.operations.chain.plone.contentTypes.operations'] = \
-        ['my.package.mymutator', 'my.package.anothermutator']
+        ['my.package.operation1', 'my.package.operation2']
 
 The last line here is setting the ``operations`` option for the chain
-mutator, in a way that is specific to the ``plone.contentTypes`` rule set.
+operation, in a way that is specific to the ``plone.contentTypes`` rule set.
 More on the configuration syntax shortly.
 
-If you need to list all response mutators for UI purposes, you can look up
-the registered instances of the ``IResponseMutatorType`` utility::
+If you need to list all operations for UI purposes, you can look up
+the registered instances of the ``ICachingOperationType`` utility::
 
     from zope.component import getUtilitiesFor
-    from plone.caching.interfaces import IResponseMutatorType
+    from plone.caching.interfaces import ICachingOperationType
     
-    for name, type_ in getUtilitiesFor(IResponseMutatorType):
+    for name, type_ in getUtilitiesFor(ICachingOperationType):
         ...
 
-The ``IResponseMutatorType`` utility provides properties like ``title`` and
+The ``ICachingOperationType`` utility provides properties like ``title`` and
 ``description`` to help build a user interface around caching operations.
 `plone.app.caching`_ provides just such an interface.
 
-Mapping cache rules to cache interceptors
------------------------------------------
-
-Cache interceptors are very similar to response mutators, and can be managed
-much in the same way. The differences are:
-
-* The mapping setting is called ``interceptorMapping`` instead of
-  ``mutatorMapping``
-* The type utility interface is ``ICacheInterceptorType`` instead of
-  ``IResponseMutatorType``
-* There is no "chain" interceptor by default.
-
-Setting options for a response mutator or cache interceptor
------------------------------------------------------------
+Setting options for caching operations
+--------------------------------------
 
 ``plone.caching`` does not strictly enforce how caching operations configure
 themselves, if at all. However, it provides helper functionality to encourage
 a pattern based on settings stored in ``plone.registry``. We have already seen
-this pattern in use for the chain response mutator above. Let's now take a
-closer look.
+this pattern in use for the chain operation above. Let's now take a closer
+look.
 
-The chain mutator is implemented by the ``plone.caching.operations.Chain``.
-The ``IResponseMutatorType`` or ``ICacheInterceptor`` utility named
-``plone.caching.operations.chain`` provides two attributes in addition to the
-``title`` and ``description`` attributes mentioned above:
+The chain operation is implemented by the class
+``plone.caching.operations.Chain``. The ``ICachingOperationType`` utility
+named ``plone.caching.operations.chain`` provides two attributes in addition
+to the ``title`` and ``description`` attributes mentioned above:
 
 prefix
     A dotted name prefix used for all registry keys. This key must be unique.
-    By convention, it is the name of the mutator or interceptor.
+    By convention, it is the name of the caching operation
 options
-    A sequence of option names
+    A tuple of option names
     
 Taken together, these attributes describe the configurable options (if any)
 of the caching operation. By default, the two are concatenated, so that if
-you have an operation called ``my.package.mymutator``, the prefix is the same
+you have an operation called ``my.package.operation``, the prefix is the same
 string, and the options are ``('option1', 'option2')``, two registry keys
-will be used: ``my.package.mymutator.option1`` and
-``my.package.mymutator.option2``. (The type of those records and their value
+will be used: ``my.package.operation.option1`` and
+``my.package.operation.option2``. (The type of those records and their value
 will obviously depend on how the registry is configured. Typically, the
 installation routine for a given operation will create them with sensible
 defaults).
@@ -237,23 +224,19 @@ defaults).
 If you need to change these settings on a per-cache-rule basis, you can do
 so by inserting the cache rule name between the prefix and the option name.
 For example, for the cache rule ``my.rule``, the rule-specific version of
-``option1`` would be ``my.package.mymutator.my.rule.option1``.
+``option1`` would be ``my.package.operation.my.rule.option1``.
 
 Finally, note that it is generally safe to use caching operations if their
 registry keys are not installed. That is, they should fall back on sensible
 defaults and not crash.
 
-Writing response mutators and cache interceptors
-************************************************
+Writing caching operations
+**************************
 
 Now that we have seen how to configure cache rules and operations, let's look
-at how we can write our own response mutators.
+at how we can write our own caching operations
 
-Writing a response mutator
---------------------------
-
-Response mutators are typically used to set cache control response headers.
-They consist of two components:
+Caching operations consist of two components:
 
 * A named multi-adapter implementing the operation itself
 * A named utility providing metadata about the operation
@@ -262,27 +245,27 @@ Typically, both of these are implemented within a single class, although this
 is not a requirement. Typically, the operation will also look up options in
 accordance with the configuration methodology outlines above.
 
-Here is an example of an response mutator that sets a fixed max-age cache
-control header. It is registered for any published resource, and for any
-HTTP request (but not other types of request.)::
+Here is an example of an operation that sets a fixed max-age cache control
+header. It is registered for any published resource, and for any HTTP request
+(but not other types of request.)::
 
     from zope.interface import implements, classProvides, Interface
     from zope.component import adapts, queryMultiAdapter
     
     from zope.publisher.interfaces.http import IHTTPRequest
     
-    from plone.caching.interfaces import IResponseMutator
-    from plone.caching.interfaces import IResponseMutatorType
+    from plone.caching.interfaces import ICachingOperation
+    from plone.caching.interfaces import ICachingOperationType
     from plone.caching.interfaces import _    
 
     from plone.caching.utils import lookupOptions
 
     class MaxAge(object):
-        implements(IResponseMutator)
+        implements(ICachingOperation)
         adapts(Interface, IHTTPRequest)
     
         # Type metadata
-        classProvides(IResponseMutatorType)
+        classProvides(ICachingOperationType)
     
         title = _(u"Max age")
         description = _(u"Sets a fixed max age value")
@@ -293,18 +276,33 @@ HTTP request (but not other types of request.)::
             self.published = published
             self.request = request
         
-        def __call__(self, rulename, response):
-            options = lookupOptions(self.__class__, rulename)
+        def interceptResponse(self, rulename, response):
+            return None
+        
+        def modifyResponse(self, rulename, response):
+            options = lookupOptions(MaxAge, rulename)
             maxAge = options['maxAge'] or 3600
             response.setHeader('Cache-Control', 'max-age=%s, must-revalidate' % maxAge)
 
+There are two methods here:
+
+* ``interceptResponse()`` is called before Zope attempts to render the
+  published object. If this returns None, publication continues as normal. If
+  it returns a string, the request is intercepted and the cached response is
+  returned.
+* ``modifyResponse()`` is called after Zope has rendered the response (in a
+  late stage of the transformation chain set up by `plone.transformchain`_).
+  This should not return a value, but can modify the response passed in. It
+  should not modify the response body (in fact, doing so will have on effect),
+  but may set headers.
+
 Note the use of the ``lookupOptions()`` helper method. You can pass this
-either a ``IResponseMutatorType`` (or ``ICacheInterceptorType``) instance,
-or the name of one (in which case it will be looked up from the utility
-registry), as well as the current rule name. It will return a dictionary of
-all the options listed (only ``maxAge`` in this case), taking rule set
-overrides into account. The options are guaranteed to be there, but will
-fall back on a default of ``None`` if not set. 
+either an ``ICachingOperationType`` instance, or the name of one (in which
+case it will be looked up from the utility registry), as well as the current
+rule name. It will return a dictionary of all the options listed (only
+``maxAge`` in this case), taking rule set overrides into account. The
+options are guaranteed to be there, but will fall back on a default of
+``None`` if not set. 
 
 To register this component in ZCML, we would do::
 
@@ -316,34 +314,27 @@ declaration, we register the class object itself as the utility. The
 attributes are provided as class variables for that reason - setting them in
 ``__init__()``, for example, would not work.
 
-Writing a cache interceptor
----------------------------
-
-Cache interceptors are again similar to response mutators. The main
-difference, apart from the timing of their execution, is that they return a
-response body. If they return ``None``, the request is *not* intercepted, and
-view rendering continues as normal.
-
-Here is a simple example that sends a 304 not modified response always. (This
-is probably not very useful, but it serves as an example.)::
+What about the ``interceptResponse()`` method? Here is a simple example that
+sends a 304 not modified response always. (This is probably not very useful,
+but it serves as an example.)::
 
     from zope.interface import implements, classProvides, Interface
     from zope.component import adapts, queryMultiAdapter
     
     from zope.publisher.interfaces.http import IHTTPRequest
     
-    from plone.caching.interfaces import ICacheInterceptor
-    from plone.caching.interfaces import ICacheInterceptorType
+    from plone.caching.interfaces import ICachingOperation
+    from plone.caching.interfaces import ICachingOperationType
     from plone.caching.interfaces import _ 
     
     from plone.caching.utils import lookupOptions
 
     class Always304(object):
-        implements(ICacheInterceptor)
+        implements(ICachingOperation)
         adapts(Interface, IHTTPRequest)
     
         # Type metadata
-        classProvides(ICacheInterceptorType)
+        classProvides(ICachingOperationType)
     
         title = _(u"Always send 304")
         description = _(u"It's not modified, dammit!")
@@ -354,18 +345,21 @@ is probably not very useful, but it serves as an example.)::
             self.published = published
             self.request = request
         
-        def __call__(self, rulename, response):
+        def interceptResponse(self, rulename, response):
             options = lookupOptions(self.__class__, rulename)
             if options['temporarilyDisable']:
                 return None
             
             response.setStatus(304)
             return u""
+        
+        def modifyResponse(self, rulename, response):
+            pass
 
-Here, we return None to indicate that the request should not be intercepted if
-the ``temporarilyDisable`` option is set to ``True``. Otherwise, we modify
-the response and return a response body. The return value must be a unicode
-string. In this case, an empty string will suffice.
+Here, we return ``None`` to indicate that the request should not be
+intercepted if the ``temporarilyDisable`` option is set to ``True``.
+Otherwise, we modify the response and return a response body. The return value
+must be a unicode string. In this case, an empty string will suffice.
 
 The ZCML registration would look like this::
 
@@ -375,3 +369,4 @@ The ZCML registration would look like this::
 .. _z3c.caching: http://pypi.python.org/pypi/z3c.caching
 .. _plone.registry: http://pypi.python.org/pypi/plone.registry
 .. _plone.app.caching: http://pypi.python.org/pypi/plone.app.caching
+.. _plone.transformchain: http://pypi.python.org/pypi/plone.transformchain

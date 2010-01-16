@@ -36,7 +36,7 @@ class ICachingOperation(Interface):
     Should be registered as a named multi-adapter from a cacheable object
     (e.g. a view, or just Interface for a general operation) and the request.
     """
-
+    
     def interceptResponse(ruleset, response):
         """Intercept the response if appropriate.
         
@@ -51,7 +51,6 @@ class ICachingOperation(Interface):
         
         The response body should *not* be modified.
         """
-
     
     def modifyResponse(ruleset, response):
         """Modify the response. ``rulset`` is the name of the caching ruleset

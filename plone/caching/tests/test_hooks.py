@@ -57,13 +57,13 @@ class TestMutateResponse(unittest.TestCase):
     
     def setUp(self):
         provideAdapter(RulesetRegistry)
-        provideAdapter(DefaultRulesetLookup)
         provideAdapter(persistentFieldAdapter)
     
     def tearDown(self):
         zope.component.testing.tearDown()
     
     def test_no_published_object(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -78,6 +78,7 @@ class TestMutateResponse(unittest.TestCase):
         self.assertEquals({}, dict(request.response))
     
     def test_no_registry(self):
+        provideAdapter(DefaultRulesetLookup)
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         
@@ -87,6 +88,7 @@ class TestMutateResponse(unittest.TestCase):
         self.assertEquals({}, dict(request.response))
     
     def test_no_records(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -96,22 +98,8 @@ class TestMutateResponse(unittest.TestCase):
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
     
-    def test_no_cache_rule(self):
-        provideUtility(Registry(), IRegistry)
-        registry = getUtility(IRegistry)
-        registry.registerInterface(ICacheSettings)
-        settings = registry.forInterface(ICacheSettings)
-        settings.enabled = True
-        
-        view = DummyView()
-        request = DummyRequest(view, DummyResponse())
-        
-        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
-        
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
-        
     def test_no_mapping(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -128,7 +116,63 @@ class TestMutateResponse(unittest.TestCase):
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
     
+    def test_no_cache_rule(self):
+        provideAdapter(DefaultRulesetLookup)
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        
+        settings.operationMapping = {'testrule': 'dummy'}
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        
+        self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({}, dict(request.response))
+    
+    def test_no_lookup_adapter(self):
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        
+        z3c.caching.registry.register(DummyView, 'testrule')
+        settings.operationMapping = {'testrule': 'dummy'}
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        
+        self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({}, dict(request.response))
+    
+    def test_operation_name_not_found(self):
+        provideAdapter(DefaultRulesetLookup)
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        
+        z3c.caching.registry.register(DummyView, 'testrule')
+        settings.operationMapping = {'foo': 'bar'}
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        
+        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        
+        self.assertEquals({'PUBLISHED': view}, dict(request))
+        self.assertEquals({'X-Cache-Rule': ['testrule']}, dict(request.response))
+    
     def test_operation_not_found(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -147,6 +191,7 @@ class TestMutateResponse(unittest.TestCase):
         self.assertEquals({'X-Cache-Rule': ['testrule']}, dict(request.response))
     
     def test_match_unicode(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -183,6 +228,7 @@ class TestMutateResponse(unittest.TestCase):
                            'X-Cache-Foo': ['test']}, dict(request.response))
     
     def test_match_bytes(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -219,6 +265,7 @@ class TestMutateResponse(unittest.TestCase):
                            'X-Cache-Foo': ['test']}, dict(request.response))
     
     def test_match_iterable(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -255,6 +302,7 @@ class TestMutateResponse(unittest.TestCase):
                            'X-Cache-Foo': ['test']}, dict(request.response))
     
     def test_match_method(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -291,6 +339,7 @@ class TestMutateResponse(unittest.TestCase):
                            'X-Cache-Foo': ['test']}, dict(request.response))
     
     def test_off_switch(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -328,13 +377,13 @@ class TestIntercept(unittest.TestCase):
     
     def setUp(self):
         provideAdapter(RulesetRegistry)
-        provideAdapter(DefaultRulesetLookup)
         provideAdapter(persistentFieldAdapter)
     
     def tearDown(self):
         zope.component.testing.tearDown()
     
     def test_no_published_object(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -348,6 +397,7 @@ class TestIntercept(unittest.TestCase):
         self.assertEquals({}, dict(request.response))
     
     def test_no_registry(self):
+        provideAdapter(DefaultRulesetLookup)
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         
@@ -357,6 +407,7 @@ class TestIntercept(unittest.TestCase):
         self.assertEquals({}, dict(request.response))
     
     def test_no_records(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         
         view = DummyView()
@@ -367,13 +418,15 @@ class TestIntercept(unittest.TestCase):
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
     
-    
     def test_no_cache_rule(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
+        
+        settings.operationMapping = {'testrule': 'dummy'}
         
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -383,11 +436,14 @@ class TestIntercept(unittest.TestCase):
         self.assertEquals({}, dict(request.response))
         
     def test_no_mapping(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
+        
+        settings.operationMapping = None
         
         z3c.caching.registry.register(DummyView, 'testrule')
         
@@ -399,6 +455,7 @@ class TestIntercept(unittest.TestCase):
         self.assertEquals({}, dict(request.response))
     
     def test_operation_not_found(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -416,6 +473,7 @@ class TestIntercept(unittest.TestCase):
         self.assertEquals({'X-Cache-Rule': ['testrule']}, dict(request.response))
     
     def test_match_abort(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -451,6 +509,7 @@ class TestIntercept(unittest.TestCase):
                            'X-Cache-Foo': ['test']}, dict(request.response))
     
     def test_match_body(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -498,6 +557,7 @@ class TestIntercept(unittest.TestCase):
                            'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_match_body_explicitly_enable_transform_chain(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -546,6 +606,7 @@ class TestIntercept(unittest.TestCase):
                            'X-Cache-Foo': ['test']}, dict(request.response))
     
     def test_match_body_method(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)
@@ -593,6 +654,7 @@ class TestIntercept(unittest.TestCase):
                            'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_off_switch(self):
+        provideAdapter(DefaultRulesetLookup)
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         registry.registerInterface(ICacheSettings)

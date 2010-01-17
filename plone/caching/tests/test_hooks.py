@@ -13,6 +13,7 @@ from plone.registry.interfaces import IRegistry
 from plone.registry import Registry
 from plone.registry.fieldfactory import persistentFieldAdapter
 
+from plone.caching.interfaces import IRulesetLookup
 from plone.caching.interfaces import ICachingOperation
 from plone.caching.interfaces import ICacheSettings
 
@@ -21,6 +22,9 @@ from plone.caching.lookup import DefaultRulesetLookup
 from plone.caching.hooks import MutatorTransform
 from plone.caching.hooks import intercept
 from plone.caching.hooks import Intercepted
+from plone.caching.hooks import InterceptorResponse
+
+from ZODB.POSException import ConflictError
 
 class DummyView(object):
     pass
@@ -686,6 +690,69 @@ class TestIntercept(unittest.TestCase):
         intercept(DummyEvent(request))
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({}, dict(request.response))
+    
+    def test_dont_swallow_conflict_error(self):
+        
+        class DummyRulesetLookup(object):
+            implements(IRulesetLookup)
+            adapts(Interface, Interface)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self):
+                raise ConflictError()
+        
+        provideAdapter(DummyRulesetLookup)
+        
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        settings.operationMapping = {'foo': 'bar'}
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        self.assertRaises(ConflictError, intercept, DummyEvent(request))
+    
+    def test_swallow_other_error(self):
+        
+        class DummyRulesetLookup(object):
+            implements(IRulesetLookup)
+            adapts(Interface, Interface)
+            
+            def __init__(self, published, request):
+                self.published = published
+                self.request = request
+            
+            def __call__(self):
+                raise AttributeError("Should be swallowed and logged")
+        
+        provideAdapter(DummyRulesetLookup)
+        
+        provideUtility(Registry(), IRegistry)
+        registry = getUtility(IRegistry)
+        registry.registerInterface(ICacheSettings)
+        settings = registry.forInterface(ICacheSettings)
+        settings.enabled = True
+        settings.operationMapping = {'foo': 'bar'}
+        
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        
+        try:
+            intercept(DummyEvent(request))
+        except:
+            self.fail("Intercept should not raise")
+    
+    def test_exception_view(self):
+        view = DummyView()
+        request = DummyRequest(view, DummyResponse())
+        exc = Intercepted(status=200, responseBody=u"Test")
+        excView = InterceptorResponse(exc, request)
+        self.assertEquals(u"Test", excView())
     
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)

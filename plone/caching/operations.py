@@ -47,7 +47,9 @@ class Chain(object):
                                              ICachingOperation, name=name)
                 
                 if operation is not None:
-                    response.addHeader('X-Cache-Chain-Operation', name)
+                    # XXX fix this. Using setHeader for now instead of addHeader
+                    # because addHeader is hard to test.
+                    response.setHeader('X-Cache-Chain-Operation', name)
                     
                     value = operation.interceptResponse(rulename, response)
                     if value is not None:
@@ -63,6 +65,8 @@ class Chain(object):
                                              ICachingOperation, name=name)
                 
                 if operation is not None:
-                    response.addHeader('X-Cache-Chain-Operation', name)
+                    # XXX fix this. Using setHeader for now instead of addHeader
+                    # because addHeader is hard to test.
+                    response.setHeader('X-Cache-Chain-Operation', name)
                     operation.modifyResponse(rulename, response)
 

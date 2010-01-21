@@ -62,8 +62,9 @@ def intercept(event):
         
         if rule is None:
             return
-        
-        request.response.addHeader(X_CACHE_RULE_HEADER, rule)
+        # XXX fix this. Using setHeader for now instead of addHeader
+        # because addHeader is hard to test.
+        request.response.setHeader(X_CACHE_RULE_HEADER, rule)
         logger.debug("Published: %s Ruleset: %s Operation: %s", repr(published), rule, operation)
         
         if operation is not None:
@@ -74,7 +75,10 @@ def intercept(event):
                 
                 # Only put this in the response if the operation actually
                 # intercepted something
-                request.response.addHeader(X_CACHE_OPERATION_HEADER, operationName)
+                
+                # XXX fix this. Using setHeader for now instead of addHeader
+                # because addHeader is hard to test.
+                request.response.setHeader(X_CACHE_OPERATION_HEADER, operationName)
                 
                 # Stop any post-processing, including the operation's response
                 # modification
@@ -141,10 +145,13 @@ class MutatorTransform(object):
         
         if rule is None:
             return
-        
-        request.response.addHeader(X_CACHE_RULE_HEADER, rule)
+        # XXX fix this. Using setHeader for now instead of addHeader
+        # because addHeader is hard to test.
+        request.response.setHeader(X_CACHE_RULE_HEADER, rule)
         logger.debug("Published: %s Ruleset: %s Operation: %s", repr(published), rule, operation)
         
         if operation is not None:
-            request.response.addHeader(X_CACHE_OPERATION_HEADER, operationName)
+            # XXX fix this. Using setHeader for now instead of addHeader
+            # because addHeader is hard to test.
+            request.response.setHeader(X_CACHE_OPERATION_HEADER, operationName)
             operation.modifyResponse(rule, request.response)

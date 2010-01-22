@@ -26,6 +26,9 @@ class DummyResponse(dict):
     
     def addHeader(self, name, value):
         self.setdefault(name, []).append(value)
+    
+    def setHeader(self, name, value):
+        self[name] = value
 
 class DummyRequest(dict):
     def __init__(self, published, response):
@@ -125,7 +128,7 @@ class TestChain(unittest.TestCase):
         
         self.assertEquals(u"foo", ret)
         self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Chain-Operation': ['op2']}, dict(request.response))
+        self.assertEquals({'X-Cache-Chain-Operations': 'op2'}, dict(request.response))
         
         request = DummyRequest(view, DummyResponse())
         chain = Chain(view, request)
@@ -133,7 +136,7 @@ class TestChain(unittest.TestCase):
         
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({'X-Mutated': 'testrule',
-                           'X-Cache-Chain-Operation': ['op2']}, dict(request.response))
+                           'X-Cache-Chain-Operations': 'op2'}, dict(request.response))
 
     def test_multiple_operations_multiple_found(self):
         self.registry.records["%s.operations" % Chain.prefix] = Record(field.List(), ['op1', 'op2'])
@@ -178,7 +181,7 @@ class TestChain(unittest.TestCase):
         
         self.assertEquals(u"foo", ret)
         self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Chain-Operation': ['op1']}, dict(request.response))
+        self.assertEquals({'X-Cache-Chain-Operations': 'op1'}, dict(request.response))
         
         request = DummyRequest(view, DummyResponse())
         chain = Chain(view, request)
@@ -187,7 +190,7 @@ class TestChain(unittest.TestCase):
         self.assertEquals({'PUBLISHED': view}, dict(request))
         self.assertEquals({'X-Mutated-1': 'testrule',
                            'X-Mutated-2': 'testrule',
-                           'X-Cache-Chain-Operation': ['op1', 'op2']}, dict(request.response))
+                           'X-Cache-Chain-Operations': 'op1; op2'}, dict(request.response))
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)

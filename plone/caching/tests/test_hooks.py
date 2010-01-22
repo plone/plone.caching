@@ -40,6 +40,9 @@ class DummyResponse(dict):
     def addHeader(self, name, value):
         self.setdefault(name, []).append(value)
     
+    def setHeader(self, name, value):
+        self[name] = [value]
+    
     def setStatus(self, value, lock=None):
         self.status = value
         if lock is not None:

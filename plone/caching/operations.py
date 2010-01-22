@@ -40,23 +40,7 @@ class Chain(object):
     def interceptResponse(self, rulename, response):
         options = lookupOptions(self.__class__, rulename)
         
-        if options['operations']:
-            for name in options['operations']:
-                
-                operation = queryMultiAdapter((self.published, self.request),
-                                             ICachingOperation, name=name)
-                
-                if operation is not None:
-                    # XXX fix this. Using setHeader for now instead of addHeader
-                    # because addHeader is hard to test.
-                    response.setHeader('X-Cache-Chain-Operation', name)
-                    
-                    value = operation.interceptResponse(rulename, response)
-                    if value is not None:
-                        return value
-    
-    def modifyResponse(self, rulename, response):
-        options = lookupOptions(self.__class__, rulename)
+        chained = []
         
         if options['operations']:
             for name in options['operations']:
@@ -65,8 +49,27 @@ class Chain(object):
                                              ICachingOperation, name=name)
                 
                 if operation is not None:
-                    # XXX fix this. Using setHeader for now instead of addHeader
-                    # because addHeader is hard to test.
-                    response.setHeader('X-Cache-Chain-Operation', name)
+                    chained.append(name)
+                    
+                    value = operation.interceptResponse(rulename, response)
+                    if value is not None:
+                        response.setHeader('X-Cache-Chain-Operations', '; '.join(chained))
+                        return value
+    
+    def modifyResponse(self, rulename, response):
+        options = lookupOptions(self.__class__, rulename)
+        
+        chained = []
+        
+        if options['operations']:
+            for name in options['operations']:
+                
+                operation = queryMultiAdapter((self.published, self.request),
+                                             ICachingOperation, name=name)
+                
+                if operation is not None:
+                    chained.append(name)
                     operation.modifyResponse(rulename, response)
 
+        if chained:
+            response.setHeader('X-Cache-Chain-Operations', '; '.join(chained))

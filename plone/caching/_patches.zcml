@@ -1,0 +1,22 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:monkey="http://namespaces.plone.org/monkey"
+    i18n_domain="plone.app.caching">
+    
+    <include package="collective.monkeypatcher" file="meta.zcml" />
+    
+    <monkey:patch
+        description="Add PubBeforeStreaming event"
+        class="ZPublisher.HTTPResponse.HTTPResponse"
+        original="write"
+        replacement="._patches.ZPublisher_HTTPResponse_write"
+        />
+
+    <monkey:patch
+        description="Add PubBeforeStreaming event"
+        class="ZServer.HTTPResponse.ZServerHTTPResponse"
+        original="write"
+        replacement="._patches.ZServer_ZServerHTTPResponse_write"
+        />    
+    
+</configure>

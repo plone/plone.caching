@@ -2,10 +2,14 @@ import logging
 
 from zope.interface import implements
 from zope.interface import Interface
+from zope.interface import alsoProvides
 
 from zope.component import adapts, adapter
 
+from zope.globalrequest import getRequest
+
 from ZPublisher.interfaces import IPubAfterTraversal
+from ZPublisher.interfaces import IPubBeforeStreaming
 from ZODB.POSException import ConflictError
 
 from plone.transformchain.interfaces import ITransform
@@ -17,6 +21,13 @@ from plone.caching.interfaces import X_CACHE_OPERATION_HEADER
 from plone.caching.utils import findOperation
 
 logger = logging.getLogger('plone.caching')
+
+class IStreamedResponse(Interface):
+    """Marker applied when we intercepted a streaming response. This allows
+    us to avoid applying the same rules twice, since the normal hook may also
+    be executed for streaming responses (albeit on a seemingly empty body,
+    and after the response has been sent).
+    """
 
 class Intercepted(Exception):
     """Exception raised in order to abort regular processing before the
@@ -136,6 +147,12 @@ class MutatorTransform(object):
     def mutate(self):
         
         request = self.request
+        
+        # Abort if this was a streamed request handled by our event handler
+        # below
+        if IStreamedResponse.providedBy(request):
+            return
+        
         published = request.get('PUBLISHED', None)
         
         rule, operationName, operation = findOperation(request)
@@ -150,3 +167,39 @@ class MutatorTransform(object):
             
             request.response.setHeader(X_CACHE_OPERATION_HEADER, operationName)
             operation.modifyResponse(rule, request.response)
+
+# Hook for streaming responses - does not use plone.transformchain, since
+# sequencing is less likely to be an issue here
+
+@adapter(IPubBeforeStreaming)
+def modifyStreamingResponse(event):
+    """Invoke the modifyResponse() method of a caching operation, if one
+    can be found, for a streaming response (one using response.write()).
+    """
+    
+    response = event.response
+    if response is None:
+        return
+    
+    request = getRequest()
+    if request is None:
+        return
+    
+    # Mark the response to allow us to avoid attempting a modify operation
+    # again in the normal hook above
+    alsoProvides(request, IStreamedResponse)
+    
+    published = request.get('PUBLISHED', None)
+    
+    rule, operationName, operation = findOperation(request)
+    
+    if rule is None:
+        return
+    
+    response.setHeader(X_CACHE_RULE_HEADER, rule)
+    logger.debug("Published: %s Ruleset: %s Operation: %s", repr(published), rule, operation)
+    
+    if operation is not None:
+        
+        response.setHeader(X_CACHE_OPERATION_HEADER, operationName)
+        operation.modifyResponse(rule, response)

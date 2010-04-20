@@ -1,6 +1,6 @@
-Changelog for plone.caching
+Changelog
+---------
 
-    (name of developer listed in brackets)
 
 plone.caching - 1.0a1 Unreleased
 

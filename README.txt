@@ -1,7 +1,10 @@
-plone.caching - A cache header management framework for Zope 2
-==============================================================
+.. contents:: Table of Contents
 
-This package provides a framework for the management of cache headers, built
+
+Introduction
+------------
+
+The ``plone.caching`` package provides a framework for the management of cache headers, built
 atop `z3c.caching`_. It consists of the following elements:
 
 * An interface ``ICachingOperation``, describing components which:

@@ -1,7 +1,10 @@
-plone.caching
-=============
+.. contents:: Table of Contents
 
-This package provides a framework for the management of cache headers, built
+
+Introduction
+------------
+
+The ``plone.caching`` package provides a framework for the management of cache headers, built
 atop `z3c.caching`_. It consists of the following elements:
 
 * An interface ``ICachingOperation``, describing components which:
@@ -33,8 +36,9 @@ atop `z3c.caching`_. It consists of the following elements:
   execute. (${rulename} refers to the name of the caching rule set in use -
   more on this later).
 
+
 Usage
-~~~~~
+-----
 
 To use ``plone.caching``, you must first install it into your build and load
 its configuration. If you are using Plone, you can do that by installing
@@ -85,6 +89,7 @@ If you are using Plone and have installed `plone.app.caching`_, you can do
 this from the caching control panel. In code, you can do::
 
     registry['plone.caching.interfaces.ICacheSettings.enabled'] = True
+
 
 Declaring cache rules for a view
 --------------------------------
@@ -142,6 +147,7 @@ Hints:
 * If you need to modify rule sets declared by packages not under your control,
   you can use an ``overrides.zcml`` file for your project.
 
+
 Mapping cache rules to operations
 ---------------------------------
 
@@ -191,6 +197,7 @@ The ``ICachingOperationType`` utility provides properties like ``title`` and
 ``description`` to help build a user interface around caching operations.
 `plone.app.caching`_ provides just such an interface.
 
+
 Setting options for caching operations
 --------------------------------------
 
@@ -230,8 +237,9 @@ Finally, note that it is generally safe to use caching operations if their
 registry keys are not installed. That is, they should fall back on sensible
 defaults and not crash.
 
+
 Writing caching operations
-**************************
+--------------------------
 
 Now that we have seen how to configure cache rules and operations, let's look
 at how we can write our own caching operations

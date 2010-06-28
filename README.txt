@@ -102,7 +102,7 @@ look like this::
     <configure
         xmlns="http://namespaces.zope.org/zope"
         xmlns:browser="http://namespaces.zope.org/browser"
-        xmlns:cache="http://namespaces.zope.org/cache"/>
+        xmlns:cache="http://namespaces.zope.org/cache">
 
         <cache:ruleset
             for=".frontpage.FrontpageView"

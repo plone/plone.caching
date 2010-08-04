@@ -1,12 +1,11 @@
 Changelog
 ---------
 
+1.0b1 - August 4, 2010
+~~~~~~~~~~~~~~~~~~~~~~
 
-1.0b1 - Unreleased
-~~~~~~~~~~~~~~~~~~
-
-    * ...
-
+    * Preparing release to coincide with plone.app.caching 1.0b1
+      [optilude]
 
 1.0a1 - April 22, 2010
 ~~~~~~~~~~~~~~~~~~~~~~

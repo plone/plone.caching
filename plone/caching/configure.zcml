@@ -4,9 +4,6 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="plone.caching">
     
-    <!-- XXX: remove once this is pushed into Zope 2 -->
-    <include file="_patches.zcml" />
-    
     <include package="five.globalrequest" />
     
     <include package="z3c.caching" file="meta.zcml" />

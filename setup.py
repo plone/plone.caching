@@ -33,8 +33,7 @@ setup(name='plone.caching',
           'zope.schema',
           'plone.transformchain',
           'five.globalrequest',
-          # XXX - remove once IPubBeforeStreaming is pushed into Zope 2
-          'collective.monkeypatcher',
+          'Zope2 >= 2.12.4',
       ],
       entry_points="""
       # -*- Entry points: -*-

@@ -58,11 +58,11 @@ def lookupOption(prefix, rulename, option, default=None, _registry=None):
         return default
     
     key = "%s.%s.%s" % (prefix, rulename, option,)
-    if key in registry.records:
+    if key in registry:
         return registry[key]
     
     key = "%s.%s" % (prefix, option,)
-    if key in registry.records:
+    if key in registry:
         return registry[key]
     
     return default

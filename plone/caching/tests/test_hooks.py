@@ -1,6 +1,3 @@
-# XXX - remove once we don't need these patches anymore
-import plone.caching._patches
-
 import unittest
 
 import zope.component.testing

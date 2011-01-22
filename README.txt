@@ -233,6 +233,10 @@ so by inserting the cache rule name between the prefix and the option name.
 For example, for the cache rule ``my.rule``, the rule-specific version of
 ``option1`` would be ``my.package.operation.my.rule.option1``.
 
+In this case, you probably want to use a field reference (``FieldRef``) for
+the "override" record that references the field of the "base" record. See
+the `plone.registry`_ documentation for details.
+
 Finally, note that it is generally safe to use caching operations if their
 registry keys are not installed. That is, they should fall back on sensible
 defaults and not crash.

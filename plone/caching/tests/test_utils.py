@@ -6,7 +6,7 @@ from zope.interface import classProvides
 from zope.component import provideUtility, getUtility
 
 from plone.registry.interfaces import IRegistry
-from plone.registry import Registry, Record
+from plone.registry import Registry, Record, FieldRef
 from plone.registry import field
 
 from plone.caching.interfaces import ICachingOperationType
@@ -42,8 +42,8 @@ class TestLookupOption(unittest.TestCase):
         provideUtility(Registry(), IRegistry)
         registry = getUtility(IRegistry)
         
-        registry.records['plone.caching.tests.test']  = Record(field.TextLine(), u"default")
-        registry.records['plone.caching.tests.testrule.test']  = Record(field.TextLine(), u"override")
+        registry.records['plone.caching.tests.test'] = r = Record(field.TextLine(), u"default")
+        registry.records['plone.caching.tests.testrule.test']  = Record(FieldRef(r.__name__, r.field), u"override")
         
         result = lookupOption('plone.caching.tests', 'testrule', 'test', default=_marker)
         self.assertEquals(u"override", result)

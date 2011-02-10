@@ -1,8 +1,8 @@
 Changelog
 ---------
 
-1.0b2
-~~~~~
+1.0b2 - February 10, 2011
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
     * Updated tests to reflect operation parameter overrides can now use
       plone.registry FieldRefs. Requires plone.registry >= 1.0b3.

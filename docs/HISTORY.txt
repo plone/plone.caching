@@ -4,7 +4,7 @@ Changelog
 1.0b3 - Unreleased
 ------------------
 
-1.0b2 - 02/10/2011
+1.0b2 - 2011-02-10
 ------------------
 
   * Updated tests to reflect operation parameter overrides can now use
@@ -14,13 +14,13 @@ Changelog
   * Removed monkey patches unneeded since Zope 2.12.4.
     [optilude]
 
-1.0b1 - 08/04/2010
+1.0b1 - 2010-08-04
 ------------------
 
   * Preparing release to coincide with plone.app.caching 1.0b1
     [optilude]
 
-1.0a1 - 04/22/2010
+1.0a1 - 2010-04-22
 ------------------
 
   * Initial release

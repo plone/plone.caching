@@ -1,24 +1,27 @@
 Changelog
 ---------
 
-1.0b2 - February 10, 2011
-~~~~~~~~~~~~~~~~~~~~~~~~~
+1.0b3 - Unreleased
+------------------
 
-    * Updated tests to reflect operation parameter overrides can now use
-      plone.registry FieldRefs. Requires plone.registry >= 1.0b3.
-      [optilude]
+1.0b2 - 02/10/2011
+------------------
 
-    * Removed monkey patches unneeded since Zope 2.12.4.
-      [optilude]
+  * Updated tests to reflect operation parameter overrides can now use
+    plone.registry FieldRefs. Requires plone.registry >= 1.0b3.
+    [optilude]
 
-1.0b1 - August 4, 2010
-~~~~~~~~~~~~~~~~~~~~~~
+  * Removed monkey patches unneeded since Zope 2.12.4.
+    [optilude]
 
-    * Preparing release to coincide with plone.app.caching 1.0b1
-      [optilude]
+1.0b1 - 08/04/2010
+------------------
 
-1.0a1 - April 22, 2010
-~~~~~~~~~~~~~~~~~~~~~~
+  * Preparing release to coincide with plone.app.caching 1.0b1
+    [optilude]
 
-    * Initial release
-      [optilude, newbery]
+1.0a1 - 04/22/2010
+------------------
+
+  * Initial release
+    [optilude, newbery]

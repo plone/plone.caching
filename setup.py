@@ -1,13 +1,25 @@
-from setuptools import setup, find_packages
 import os
+from setuptools import setup, find_packages
+
+
+def read(*rnames):
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 version = '1.0b3'
+
+long_description = (
+    read('README.txt')
+    + '\n' +
+#    read('plone', 'caching', 'README.txt')
+#    + '\n' +
+    read('CHANGES.txt')
+    + '\n'
+    )
 
 setup(name='plone.caching',
       version=version,
       description="Zope 2 integration for z3c.caching",
-      long_description=open("README.txt").read() + "\n" +
-                       open(os.path.join("docs", "HISTORY.txt")).read(),
+      long_description=long_description,
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
         "Framework :: Plone",

@@ -20,7 +20,7 @@ Changelog
 
 - Updated tests to reflect operation parameter overrides can now use
   plone.registry FieldRefs. Requires plone.registry >= 1.0b3.
-   [optilude]
+  [optilude]
 
 - Removed monkey patches unneeded since Zope 2.12.4.
   [optilude]

@@ -1,19 +1,17 @@
 import unittest
 
-import zope.component.testing
-
-from zope.component import provideAdapter
-
-from z3c.caching.registry import RulesetRegistry
 import z3c.caching.registry
 
 from plone.caching.lookup import DefaultRulesetLookup
+
+from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
+
 
 class DummyView(object):
     pass
 
 class DummyResponse(dict):
-    
+
     def addHeader(self, name, value):
         self.setdefault(name, []).append(value)
 
@@ -23,22 +21,18 @@ class DummyRequest(dict):
         self.response = response
 
 class TestLookup(unittest.TestCase):
-    
-    def setUp(self):
-        provideAdapter(RulesetRegistry)
-    
-    def tearDown(self):
-        zope.component.testing.tearDown()
-    
+
+    layer = IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
+
     def test_no_cache_rule(self):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         self.assertEquals(None, DefaultRulesetLookup(view, request)())
-        
+
     def test_match(self):
         z3c.caching.registry.register(DummyView, 'testrule')
         view = DummyView()
-        request = DummyRequest(view, DummyResponse())        
+        request = DummyRequest(view, DummyResponse())
         self.assertEquals('testrule', DefaultRulesetLookup(view, request)())
 
 def test_suite():

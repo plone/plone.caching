@@ -1,13 +1,10 @@
 import unittest
 
-import zope.component.testing
-
 from zope.component import adapts, provideUtility, provideAdapter, getUtility
 from zope.interface import implements, Interface
 
 from zope.globalrequest import setRequest, clearRequest
 
-from z3c.caching.registry import RulesetRegistry
 import z3c.caching.registry
 
 from plone.registry.interfaces import IRegistry
@@ -26,6 +23,8 @@ from plone.caching.hooks import intercept
 from plone.caching.hooks import modifyStreamingResponse
 from plone.caching.hooks import Intercepted
 from plone.caching.hooks import InterceptorResponse
+
+from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
 
 from ZODB.POSException import ConflictError
 
@@ -69,12 +68,10 @@ class DummyStreamingEvent(object):
 
 class TestMutateResponse(unittest.TestCase):
 
-    def setUp(self):
-        provideAdapter(RulesetRegistry)
-        provideAdapter(persistentFieldAdapter)
+    layer = IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
 
-    def tearDown(self):
-        zope.component.testing.tearDown()
+    def setUp(self):
+        provideAdapter(persistentFieldAdapter)
 
     def test_no_published_object(self):
         provideAdapter(DefaultRulesetLookup)
@@ -389,13 +386,13 @@ class TestMutateResponse(unittest.TestCase):
 
 class TestMutateResponseStreaming(unittest.TestCase):
 
+    layer = IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
+
     def setUp(self):
-        provideAdapter(RulesetRegistry)
         provideAdapter(persistentFieldAdapter)
 
     def tearDown(self):
         clearRequest()
-        zope.component.testing.tearDown()
 
     def test_no_published_object(self):
         provideAdapter(DefaultRulesetLookup)
@@ -738,12 +735,10 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
 class TestIntercept(unittest.TestCase):
 
-    def setUp(self):
-        provideAdapter(RulesetRegistry)
-        provideAdapter(persistentFieldAdapter)
+    layer = IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
 
-    def tearDown(self):
-        zope.component.testing.tearDown()
+    def setUp(self):
+        provideAdapter(persistentFieldAdapter)
 
     def test_no_published_object(self):
         provideAdapter(DefaultRulesetLookup)

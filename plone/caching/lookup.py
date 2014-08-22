@@ -7,11 +7,11 @@ from plone.caching.interfaces import IRulesetLookup
 
 class DefaultRulesetLookup(object):
     """Default ruleset lookup.
-    
+
     Only override this if you have very special needs. The safest option is
     to use ``z3c.caching`` to set rulesets.
     """
-    
+
     implements(IRulesetLookup)
     adapts(Interface, Interface)
 

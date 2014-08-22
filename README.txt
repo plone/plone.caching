@@ -15,10 +15,10 @@ atop `z3c.caching`_. It consists of the following elements:
       authorisation) to provide a cached response. The most common operation
       will be to set a "304 Not Modified" response header and return an empty
       response, although it is also possible to provide a full response body.
-  
+
   Caching operations are named multi-adapters on the published object (e.g. a
   view) and the request.
-  
+
 * An interfaces ``ICachingOperationType`` which is used for utilities
   describing caching operations. This is mainly for UI purposes, although this
   package does not provide any UI of its own.
@@ -49,7 +49,7 @@ own package's ``setup.py``::
         ...
         'plone.caching',
         ]
-        
+
 Then load the package's configuration from your own package's
 ``configure.zcml``::
 
@@ -69,17 +69,17 @@ In tests, you can do the following::
     from zope.component import provideAdapter
     from plone.registry.interfaces import IRegistry
     from plone.registry import Registry
-    
+
     provideAdapter(Registry(), IRegistry)
 
 Next, you must add the ``plone.caching`` settings to the registry. If you use
-`plone.app.caching`_, it will do this for you. Otherwise, you can register 
+`plone.app.caching`_, it will do this for you. Otherwise, you can register
 them like so::
 
     from zope.component import getUtility
     from plone.registry.interfaces import IRegistry
     from plone.caching.interfaces import ICacheSettings
-    
+
     registry = getUtility(IRegistry)
     registry.registerInterface(ICacheSettings)
 
@@ -162,7 +162,7 @@ shown above, a mapping like the following might be used::
     from zope.component import getUtility
     from plone.registry.interfaces import IRegistry
     from plone.caching.interfaces import ICacheSettings
-    
+
     registry = getUtility(IRegistry)
     settings = registry.forInterface(ICacheSettings)
     if settings.operationMapping is None: # initialise if not set already
@@ -176,7 +176,7 @@ If you want to use several operations, you can chain them together using the
 ``plone.caching.operations.chain`` operation::
 
     settings.operationMapping['plone.contentTypes'] = 'plone.caching.operations.chain'
-    
+
     registry['plone.caching.operations.chain.plone.contentTypes.operations'] = \
         ['my.package.operation1', 'my.package.operation2']
 
@@ -189,7 +189,7 @@ the registered instances of the ``ICachingOperationType`` utility::
 
     from zope.component import getUtilitiesFor
     from plone.caching.interfaces import ICachingOperationType
-    
+
     for name, type_ in getUtilitiesFor(ICachingOperationType):
         ...
 
@@ -217,7 +217,7 @@ prefix
     By convention, it is the name of the caching operation
 options
     A tuple of option names
-    
+
 Taken together, these attributes describe the configurable options (if any)
 of the caching operation. By default, the two are concatenated, so that if
 you have an operation called ``my.package.operation``, the prefix is the same
@@ -263,34 +263,34 @@ header. It is registered for any published resource, and for any HTTP request
 
     from zope.interface import implements, classProvides, Interface
     from zope.component import adapts, queryMultiAdapter
-    
+
     from zope.publisher.interfaces.http import IHTTPRequest
-    
+
     from plone.caching.interfaces import ICachingOperation
     from plone.caching.interfaces import ICachingOperationType
-    from plone.caching.interfaces import _    
+    from plone.caching.interfaces import _
 
     from plone.caching.utils import lookupOptions
 
     class MaxAge(object):
         implements(ICachingOperation)
         adapts(Interface, IHTTPRequest)
-    
+
         # Type metadata
         classProvides(ICachingOperationType)
-    
+
         title = _(u"Max age")
         description = _(u"Sets a fixed max age value")
         prefix = 'plone.caching.tests.maxage'
         options = ('maxAge',)
-    
+
         def __init__(self, published, request):
             self.published = published
             self.request = request
-        
+
         def interceptResponse(self, rulename, response):
             return None
-        
+
         def modifyResponse(self, rulename, response):
             options = lookupOptions(MaxAge, rulename)
             maxAge = options['maxAge'] or 3600
@@ -314,7 +314,7 @@ case it will be looked up from the utility registry), as well as the current
 rule name. It will return a dictionary of all the options listed (only
 ``maxAge`` in this case), taking rule set overrides into account. The
 options are guaranteed to be there, but will fall back on a default of
-``None`` if not set. 
+``None`` if not set.
 
 To register this component in ZCML, we would do::
 
@@ -332,39 +332,39 @@ but it serves as an example.)::
 
     from zope.interface import implements, classProvides, Interface
     from zope.component import adapts, queryMultiAdapter
-    
+
     from zope.publisher.interfaces.http import IHTTPRequest
-    
+
     from plone.caching.interfaces import ICachingOperation
     from plone.caching.interfaces import ICachingOperationType
-    from plone.caching.interfaces import _ 
-    
+    from plone.caching.interfaces import _
+
     from plone.caching.utils import lookupOptions
 
     class Always304(object):
         implements(ICachingOperation)
         adapts(Interface, IHTTPRequest)
-    
+
         # Type metadata
         classProvides(ICachingOperationType)
-    
+
         title = _(u"Always send 304")
         description = _(u"It's not modified, dammit!")
         prefix = 'plone.caching.tests.always304'
         options = ('temporarilyDisable',)
-    
+
         def __init__(self, published, request):
             self.published = published
             self.request = request
-        
+
         def interceptResponse(self, rulename, response):
             options = lookupOptions(self.__class__, rulename)
             if options['temporarilyDisable']:
                 return None
-            
+
             response.setStatus(304)
             return u""
-        
+
         def modifyResponse(self, rulename, response):
             pass
 

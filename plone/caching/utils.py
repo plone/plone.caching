@@ -12,7 +12,7 @@ from plone.caching.interfaces import ICacheSettings
 
 def lookupOptions(type_, rulename, default=None):
     """Look up all options for a given caching operation type, returning
-    a dictionary. They keys of the dictionary will be the items in the
+    a dictionary. The keys of the dictionary will be the items in the
     ``options`` tuple of an ``ICachingOperationType``.
 
     ``type`` should either be a ``ICachingOperationType`` instance or the name

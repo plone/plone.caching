@@ -8,8 +8,8 @@ import zope.component.testing
 
 class ImplicitRulesetRegistryUnitTestingLayer(Layer):
     """Sets the z3c.caching registry into non-explicit mode.
-    Plone uses the explicit mode by default, requiring rules to be registred
-    as uilities explicitly.
+    Plone uses the explicit mode by default, requiring rules to be registered
+    as utilities explicitly.
 
     The plone.caching unit tests do not register utilities and therefore
     require the ruleset registry to be in non-explicit mode.

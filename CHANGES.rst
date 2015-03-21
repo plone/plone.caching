@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0.1 - Unreleased
+1.0.1 (2015-03-21)
 ------------------
 
 - Fix ruleset registry test isolation so that is no longer order dependent.

@@ -3,7 +3,7 @@ import zope.i18nmessageid
 from zope.interface import Interface
 from zope import schema
 
-_ = zope.i18nmessageid.MessageFactory('plone.caching')
+_ = zope.i18nmessageid.MessageFactory('plone')
 
 X_CACHE_RULE_HEADER      = 'X-Cache-Rule'
 X_CACHE_OPERATION_HEADER = 'X-Cache-Operation'

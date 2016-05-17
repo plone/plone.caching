@@ -4,10 +4,6 @@ Changelog
 1.1.0 (unreleased)
 ------------------
 
-New:
-
-- *add item here*
-
 Fixes:
 
 - Use plone i18n domain.  [klinger]

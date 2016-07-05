@@ -1,7 +1,7 @@
 import unittest
 
 from zope.component import adapts, provideUtility, provideAdapter, getUtility
-from zope.interface import implements, Interface
+from zope.interface import implementer, Interface
 
 from zope.globalrequest import setRequest, clearRequest
 
@@ -212,8 +212,8 @@ class TestMutateResponse(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -249,8 +249,8 @@ class TestMutateResponse(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -286,8 +286,8 @@ class TestMutateResponse(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -323,8 +323,8 @@ class TestMutateResponse(unittest.TestCase):
         z3c.caching.registry.register(DummyResource, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -360,8 +360,8 @@ class TestMutateResponse(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -551,8 +551,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -590,8 +590,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -629,8 +629,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -668,8 +668,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         z3c.caching.registry.register(DummyResource, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -707,8 +707,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -841,8 +841,8 @@ class TestIntercept(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -877,8 +877,8 @@ class TestIntercept(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -925,8 +925,8 @@ class TestIntercept(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -974,8 +974,8 @@ class TestIntercept(unittest.TestCase):
         z3c.caching.registry.register(DummyResource, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -1022,8 +1022,8 @@ class TestIntercept(unittest.TestCase):
         z3c.caching.registry.register(DummyView, 'testrule')
         settings.operationMapping = {'testrule': 'op1'}
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -1047,8 +1047,8 @@ class TestIntercept(unittest.TestCase):
 
     def test_dont_swallow_conflict_error(self):
 
+        @implementer(IRulesetLookup)
         class DummyRulesetLookup(object):
-            implements(IRulesetLookup)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -1073,8 +1073,8 @@ class TestIntercept(unittest.TestCase):
 
     def test_swallow_other_error(self):
 
+        @implementer(IRulesetLookup)
         class DummyRulesetLookup(object):
-            implements(IRulesetLookup)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):

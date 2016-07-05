@@ -1,6 +1,6 @@
 import unittest
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 
 from zope.component import provideUtility
@@ -104,8 +104,8 @@ class TestChain(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
+        @implementer(ICachingOperation)
         class DummyOperation(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -141,8 +141,8 @@ class TestChain(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
+        @implementer(ICachingOperation)
         class DummyOperation1(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):
@@ -157,8 +157,8 @@ class TestChain(unittest.TestCase):
 
         provideAdapter(DummyOperation1, name="op1")
 
+        @implementer(ICachingOperation)
         class DummyOperation2(object):
-            implements(ICachingOperation)
             adapts(Interface, Interface)
 
             def __init__(self, published, request):

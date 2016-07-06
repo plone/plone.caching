@@ -1,6 +1,6 @@
 import logging
 
-from zope.interface import implements
+from zope.interface import implementer
 from zope.interface import Interface
 from zope.interface import alsoProvides
 
@@ -108,6 +108,7 @@ def intercept(event):
     except:
         logging.exception("Swallowed exception in plone.caching IPubAfterTraversal event handler")
 
+@implementer(ITransform)
 class MutatorTransform(object):
     """Transformation using plone.transformchain.
 
@@ -122,8 +123,6 @@ class MutatorTransform(object):
     response body. Instead, we look up caching operations which can modify
     response headers and perform other caching functions.
     """
-
-    implements(ITransform)
     adapts(Interface, Interface)
 
     order = 12000

@@ -2,7 +2,7 @@ import unittest
 
 import zope.component.testing
 
-from zope.interface import classProvides
+from zope.interface import provider
 from zope.component import provideUtility, getUtility
 
 from plone.registry.interfaces import IRegistry
@@ -55,8 +55,8 @@ class TestLookupOptions(unittest.TestCase):
 
     def test_lookupOptions_no_registry(self):
 
+        @provider(ICachingOperationType)
         class DummyOperation(object):
-            classProvides(ICachingOperationType)
 
             title = u""
             description = u""
@@ -69,8 +69,8 @@ class TestLookupOptions(unittest.TestCase):
     def test_lookupOptions_no_records(self):
         provideUtility(Registry(), IRegistry)
 
+        @provider(ICachingOperationType)
         class DummyOperation(object):
-            classProvides(ICachingOperationType)
 
             title = u""
             description = u""
@@ -86,8 +86,8 @@ class TestLookupOptions(unittest.TestCase):
 
         registry.records['plone.caching.tests.test2'] = Record(field.TextLine(), u"foo")
 
+        @provider(ICachingOperationType)
         class DummyOperation(object):
-            classProvides(ICachingOperationType)
 
             title = u""
             description = u""
@@ -105,8 +105,8 @@ class TestLookupOptions(unittest.TestCase):
         registry.records['plone.caching.tests.test2'] = Record(field.TextLine(), u"bar")
         registry.records['plone.caching.tests.testrule.test2'] = Record(field.TextLine(), u"baz")
 
+        @provider(ICachingOperationType)
         class DummyOperation(object):
-            classProvides(ICachingOperationType)
 
             title = u""
             description = u""
@@ -122,8 +122,8 @@ class TestLookupOptions(unittest.TestCase):
 
         registry.records['plone.caching.tests.test2'] = Record(field.TextLine(), u"foo")
 
+        @provider(ICachingOperationType)
         class DummyOperation(object):
-            classProvides(ICachingOperationType)
 
             title = u""
             description = u""

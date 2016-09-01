@@ -77,19 +77,20 @@ class ICachingOperationType(Interface):
 
     The usual pattern is::
 
-        from zope.interface import implements, classProvides, Interface
-        from zope.component import adapts
-
         from plone.caching.interfaces import ICachingOperation
         from plone.caching.interfaces import ICachingOperationType
-
         from plone.caching.utils import lookupOptions
+        from zope.component import adapter
+        from zope.interface import implementer
+        from zope.interface import Interface
+        from zope.interface import provider
 
+
+        @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
+        @provider(ICachingOperationType)
         class SomeOperation(object):
-            implements(ICachingOperation)
-            adapts(Interface, Interface)
 
-            classProvides(ICachingOperationType)
             title = u"Some operation"
             description = u"Operation description"
             prefix = 'my.package.operation1'

@@ -66,11 +66,11 @@ def lookupOption(prefix, rulename, option, default=None, _registry=None):
     if registry is None:
         return default
 
-    key = "%s.%s.%s" % (prefix, rulename, option,)
+    key = '.'.join((prefix, rulename, option,))
     if key in registry:
         return registry[key]
 
-    key = "%s.%s" % (prefix, option,)
+    key = '.'.join((prefix, option,))
     if key in registry:
         return registry[key]
 

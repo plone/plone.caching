@@ -6,7 +6,7 @@ from plone.registry import field
 from plone.registry import Record
 from plone.registry import Registry
 from plone.registry.interfaces import IRegistry
-from zope.component import adapts
+from zope.component import adapter
 from zope.component import provideAdapter
 from zope.component import provideUtility
 from zope.interface import implementer
@@ -17,8 +17,10 @@ import unittest
 
 _marker = object()
 
+
 class DummyView(object):
     pass
+
 
 class DummyResponse(dict):
 
@@ -27,6 +29,7 @@ class DummyResponse(dict):
 
     def setHeader(self, name, value):
         self[name] = value
+
 
 class DummyRequest(dict):
     def __init__(self, published, response):
@@ -50,13 +53,15 @@ class TestChain(unittest.TestCase):
         ret = chain.interceptResponse('testrule', request.response)
         chain.modifyResponse('testrule', request.response)
 
-        self.assertEquals(None, ret)
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual(None, ret)
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_operations_list_not_set(self):
 
-        self.registry.records["%s.operations" % Chain.prefix] = Record(field.List())
+        self.registry.records[
+            '{0}.operations'.format(Chain.prefix)
+        ] = Record(field.List())
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -65,13 +70,15 @@ class TestChain(unittest.TestCase):
         ret = chain.interceptResponse('testrule', request.response)
         chain.modifyResponse('testrule', request.response)
 
-        self.assertEquals(None, ret)
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual(None, ret)
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_operations_empty(self):
 
-        self.registry.records["%s.operations" % Chain.prefix] = Record(field.List(), [])
+        self.registry.records[
+            '{0}.operations'.format(Chain.prefix)
+        ] = Record(field.List(), [])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -80,13 +87,15 @@ class TestChain(unittest.TestCase):
         ret = chain.interceptResponse('testrule', request.response)
         chain.modifyResponse('testrule', request.response)
 
-        self.assertEquals(None, ret)
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual(None, ret)
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_chained_operations_not_found(self):
 
-        self.registry.records["%s.operations" % Chain.prefix] = Record(field.List(), ['op1'])
+        self.registry.records[
+            '{0}.operations'.format(Chain.prefix)
+        ] = Record(field.List(), ['op1'])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -94,99 +103,116 @@ class TestChain(unittest.TestCase):
         chain = Chain(view, request)
         chain.modifyResponse('testrule', request.response)
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_multiple_operations_one_found(self):
-        self.registry.records["%s.operations" % Chain.prefix] = Record(field.List(), ['op1', 'op2'])
+        self.registry.records[
+            '{0}.operations'.format(Chain.prefix)
+        ] = Record(field.List(), ['op1', 'op2'])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def interceptResponse(self, rulename, response):
-                return u"foo"
+                return u'foo'
 
             def modifyResponse(self, rulename, response):
                 response['X-Mutated'] = rulename
 
-        provideAdapter(DummyOperation, name="op2")
+        provideAdapter(DummyOperation, name='op2')
 
         chain = Chain(view, request)
         ret = chain.interceptResponse('testrule', request.response)
 
-        self.assertEquals(u"foo", ret)
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Chain-Operations': 'op2'}, dict(request.response))
+        self.assertEqual(u'foo', ret)
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'X-Cache-Chain-Operations': 'op2'},
+            dict(request.response)
+        )
 
         request = DummyRequest(view, DummyResponse())
         chain = Chain(view, request)
         chain.modifyResponse('testrule', request.response)
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Mutated': 'testrule',
-                           'X-Cache-Chain-Operations': 'op2'}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'X-Mutated': 'testrule',
+             'X-Cache-Chain-Operations': 'op2'},
+            dict(request.response)
+        )
 
     def test_multiple_operations_multiple_found(self):
-        self.registry.records["%s.operations" % Chain.prefix] = Record(field.List(), ['op1', 'op2'])
+        self.registry.records[
+            '{0}.operations'.format(Chain.prefix)
+        ] = Record(field.List(), ['op1', 'op2'])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation1(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def interceptResponse(self, rulename, response):
-                return u"foo"
+                return u'foo'
 
             def modifyResponse(self, rulename, response):
                 response['X-Mutated-1'] = rulename
 
-        provideAdapter(DummyOperation1, name="op1")
+        provideAdapter(DummyOperation1, name='op1')
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation2(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def interceptResponse(self, rulename, response):
-                return u"bar"
+                return u'bar'
 
             def modifyResponse(self, rulename, response):
                 response['X-Mutated-2'] = rulename
 
-        provideAdapter(DummyOperation2, name="op2")
+        provideAdapter(DummyOperation2, name='op2')
 
         chain = Chain(view, request)
         ret = chain.interceptResponse('testrule', request.response)
 
-        self.assertEquals(u"foo", ret)
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Chain-Operations': 'op1'}, dict(request.response))
+        self.assertEqual(u'foo', ret)
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'X-Cache-Chain-Operations': 'op1'},
+            dict(request.response)
+        )
 
         request = DummyRequest(view, DummyResponse())
         chain = Chain(view, request)
         chain.modifyResponse('testrule', request.response)
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Mutated-1': 'testrule',
-                           'X-Mutated-2': 'testrule',
-                           'X-Cache-Chain-Operations': 'op1; op2'}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'X-Mutated-1': 'testrule',
+             'X-Mutated-2': 'testrule',
+             'X-Cache-Chain-Operations': 'op1; op2'},
+            dict(request.response)
+        )
+
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)

@@ -109,7 +109,7 @@ def intercept(event):
         raise
     except Intercepted:
         raise
-    except:
+    except Exception:
         logging.exception(
             'Swallowed exception in plone.caching IPubAfterTraversal event '
             'handler'

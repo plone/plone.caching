@@ -8,7 +8,6 @@ The ``plone.caching`` package provides a framework for the management of cache h
 atop `z3c.caching`_. It consists of the following elements:
 
 * An interface ``ICachingOperation``, describing components which:
-
     * Modify the response for caching purposes. The most common operation will
       be to set cache headers.
     * Intercept a request before view rendering (but after traversal and
@@ -261,24 +260,24 @@ Here is an example of an operation that sets a fixed max-age cache control
 header. It is registered for any published resource, and for any HTTP request
 (but not other types of request.)::
 
-    from zope.interface import implements, classProvides, Interface
-    from zope.component import adapts, queryMultiAdapter
-
-    from zope.publisher.interfaces.http import IHTTPRequest
-
+    from plone.caching.interfaces import _
     from plone.caching.interfaces import ICachingOperation
     from plone.caching.interfaces import ICachingOperationType
-    from plone.caching.interfaces import _
-
     from plone.caching.utils import lookupOptions
+    from zope.component import adapter
+    from zope.component import queryMultiAdapter
+    from zope.interface import implementer
+    from zope.interface import Interface
+    from zope.interface import provider
+    from zope.publisher.interfaces.http import IHTTPRequest
 
+
+    @implementer(ICachingOperation)
+    @adapter(Interface, IHTTPRequest)
+    @provider(ICachingOperationType)
     class MaxAge(object):
-        implements(ICachingOperation)
-        adapts(Interface, IHTTPRequest)
 
         # Type metadata
-        classProvides(ICachingOperationType)
-
         title = _(u"Max age")
         description = _(u"Sets a fixed max age value")
         prefix = 'plone.caching.tests.maxage'
@@ -330,24 +329,24 @@ What about the ``interceptResponse()`` method? Here is a simple example that
 sends a 304 not modified response always. (This is probably not very useful,
 but it serves as an example.)::
 
-    from zope.interface import implements, classProvides, Interface
-    from zope.component import adapts, queryMultiAdapter
-
-    from zope.publisher.interfaces.http import IHTTPRequest
-
+    from plone.caching.interfaces import _
     from plone.caching.interfaces import ICachingOperation
     from plone.caching.interfaces import ICachingOperationType
-    from plone.caching.interfaces import _
-
     from plone.caching.utils import lookupOptions
+    from zope.component import adapter
+    from zope.component import queryMultiAdapter
+    from zope.interface import implementer
+    from zope.interface import Interface
+    from zope.interface import provider
+    from zope.publisher.interfaces.http import IHTTPRequest
 
+
+    @implementer(ICachingOperation)
+    @adapter(Interface, IHTTPRequest)
+    @provider(ICachingOperationType)
     class Always304(object):
-        implements(ICachingOperation)
-        adapts(Interface, IHTTPRequest)
 
         # Type metadata
-        classProvides(ICachingOperationType)
-
         title = _(u"Always send 304")
         description = _(u"It's not modified, dammit!")
         prefix = 'plone.caching.tests.always304'

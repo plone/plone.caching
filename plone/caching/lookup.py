@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.caching.interfaces import IRulesetLookup
 from z3c.caching.registry import lookup
 from zope.component import adapts

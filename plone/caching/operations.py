@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.caching.interfaces import _
 from plone.caching.interfaces import ICachingOperation
 from plone.caching.interfaces import ICachingOperationType

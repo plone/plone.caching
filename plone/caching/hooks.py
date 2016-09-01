@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.caching.interfaces import X_CACHE_OPERATION_HEADER
 from plone.caching.interfaces import X_CACHE_RULE_HEADER
 from plone.caching.utils import findOperation

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.caching.lookup import DefaultRulesetLookup
 from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from plone.caching.hooks import intercept
 from plone.caching.hooks import Intercepted
 from plone.caching.hooks import InterceptorResponse

@@ -31,9 +31,16 @@ def lookupOptions(type_, rulename, default=None):
     registry = queryUtility(IRegistry)
 
     for option in getattr(type_, 'options', ()):
-        options[option] = lookupOption(type_.prefix, rulename, option, default, registry)
+        options[option] = lookupOption(
+            type_.prefix,
+            rulename,
+            option,
+            default,
+            registry
+        )
 
     return options
+
 
 def lookupOption(prefix, rulename, option, default=None, _registry=None):
     """Look up an option for a particular caching operation.
@@ -49,7 +56,8 @@ def lookupOption(prefix, rulename, option, default=None, _registry=None):
     override.
     """
 
-    # Avoid looking this up multiple times if we are being called from lookupOptions
+    # Avoid looking this up multiple times if we are being called
+    # from lookupOptions
     registry = _registry
 
     if registry is None:
@@ -67,6 +75,7 @@ def lookupOption(prefix, rulename, option, default=None, _registry=None):
         return registry[key]
 
     return default
+
 
 def findOperation(request):
 
@@ -103,5 +112,9 @@ def findOperation(request):
     if operationName is None:
         return rule, None, None
 
-    operation = queryMultiAdapter((published, request), ICachingOperation, name=operationName)
+    operation = queryMultiAdapter(
+        (published, request),
+        ICachingOperation,
+        name=operationName
+    )
     return rule, operationName, operation

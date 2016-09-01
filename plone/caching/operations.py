@@ -45,15 +45,21 @@ class Chain(object):
         if options['operations']:
             for name in options['operations']:
 
-                operation = queryMultiAdapter((self.published, self.request),
-                                             ICachingOperation, name=name)
+                operation = queryMultiAdapter(
+                    (self.published, self.request),
+                    ICachingOperation,
+                    name=name
+                )
 
                 if operation is not None:
                     chained.append(name)
 
                     value = operation.interceptResponse(rulename, response)
                     if value is not None:
-                        response.setHeader('X-Cache-Chain-Operations', '; '.join(chained))
+                        response.setHeader(
+                            'X-Cache-Chain-Operations',
+                            '; '.join(chained)
+                        )
                         return value
 
     def modifyResponse(self, rulename, response):
@@ -64,8 +70,11 @@ class Chain(object):
         if options['operations']:
             for name in options['operations']:
 
-                operation = queryMultiAdapter((self.published, self.request),
-                                             ICachingOperation, name=name)
+                operation = queryMultiAdapter(
+                    (self.published, self.request),
+                    ICachingOperation,
+                    name=name
+                )
 
                 if operation is not None:
                     chained.append(name)

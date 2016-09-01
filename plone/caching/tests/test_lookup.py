@@ -1,10 +1,8 @@
-import unittest
-
-import z3c.caching.registry
-
 from plone.caching.lookup import DefaultRulesetLookup
-
 from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
+
+import unittest
+import z3c.caching.registry
 
 
 class DummyView(object):

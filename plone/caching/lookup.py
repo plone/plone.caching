@@ -1,9 +1,9 @@
-from zope.interface import Interface
-from zope.interface import implementer
-from zope.component import adapts
-
-from z3c.caching.registry import lookup
 from plone.caching.interfaces import IRulesetLookup
+from z3c.caching.registry import lookup
+from zope.component import adapts
+from zope.interface import implementer
+from zope.interface import Interface
+
 
 @implementer(IRulesetLookup)
 class DefaultRulesetLookup(object):

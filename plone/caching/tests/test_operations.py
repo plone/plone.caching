@@ -1,20 +1,18 @@
-import unittest
-
+from plone.caching.interfaces import ICachingOperation
+from plone.caching.operations import Chain
+from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
+from plone.registry import field
+from plone.registry import Record
+from plone.registry import Registry
+from plone.registry.interfaces import IRegistry
+from zope.component import adapts
+from zope.component import provideAdapter
+from zope.component import provideUtility
 from zope.interface import implementer
 from zope.interface import Interface
 
-from zope.component import provideUtility
-from zope.component import provideAdapter
-from zope.component import adapts
+import unittest
 
-from plone.registry.interfaces import IRegistry
-from plone.registry import Registry, Record
-from plone.registry import field
-
-from plone.caching.operations import Chain
-from plone.caching.interfaces import ICachingOperation
-
-from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
 
 _marker = object()
 

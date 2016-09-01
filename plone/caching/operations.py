@@ -1,11 +1,13 @@
-from zope.interface import implementer, provider, Interface
-from zope.component import adapts, queryMultiAdapter
-
+from plone.caching.interfaces import _
 from plone.caching.interfaces import ICachingOperation
 from plone.caching.interfaces import ICachingOperationType
-from plone.caching.interfaces import _
-
 from plone.caching.utils import lookupOptions
+from zope.component import adapts
+from zope.component import queryMultiAdapter
+from zope.interface import implementer
+from zope.interface import Interface
+from zope.interface import provider
+
 
 @implementer(ICachingOperation)
 @provider(ICachingOperationType)

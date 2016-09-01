@@ -1,14 +1,14 @@
-import types
-
-from zope.component import queryUtility, getUtility
-from zope.component import queryMultiAdapter
-
-from plone.registry.interfaces import IRegistry
-
+from plone.caching.interfaces import ICacheSettings
 from plone.caching.interfaces import ICachingOperation
 from plone.caching.interfaces import ICachingOperationType
 from plone.caching.interfaces import IRulesetLookup
-from plone.caching.interfaces import ICacheSettings
+from plone.registry.interfaces import IRegistry
+from zope.component import getUtility
+from zope.component import queryMultiAdapter
+from zope.component import queryUtility
+
+import types
+
 
 def lookupOptions(type_, rulename, default=None):
     """Look up all options for a given caching operation type, returning

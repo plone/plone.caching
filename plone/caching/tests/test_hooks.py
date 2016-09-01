@@ -1,32 +1,29 @@
-import unittest
-
-from zope.component import adapts, provideUtility, provideAdapter, getUtility
-from zope.interface import implementer, Interface
-
-from zope.globalrequest import setRequest, clearRequest
-
-import z3c.caching.registry
-
-from plone.registry.interfaces import IRegistry
-
-from plone.registry import Registry
-from plone.registry.fieldfactory import persistentFieldAdapter
-
-from plone.caching.interfaces import IRulesetLookup
-from plone.caching.interfaces import ICachingOperation
-from plone.caching.interfaces import ICacheSettings
-
-from plone.caching.lookup import DefaultRulesetLookup
-
-from plone.caching.hooks import MutatorTransform
 from plone.caching.hooks import intercept
-from plone.caching.hooks import modifyStreamingResponse
 from plone.caching.hooks import Intercepted
 from plone.caching.hooks import InterceptorResponse
-
+from plone.caching.hooks import modifyStreamingResponse
+from plone.caching.hooks import MutatorTransform
+from plone.caching.interfaces import ICacheSettings
+from plone.caching.interfaces import ICachingOperation
+from plone.caching.interfaces import IRulesetLookup
+from plone.caching.lookup import DefaultRulesetLookup
 from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
-
+from plone.registry import Registry
+from plone.registry.fieldfactory import persistentFieldAdapter
+from plone.registry.interfaces import IRegistry
 from ZODB.POSException import ConflictError
+from zope.component import adapts
+from zope.component import getUtility
+from zope.component import provideAdapter
+from zope.component import provideUtility
+from zope.globalrequest import clearRequest
+from zope.globalrequest import setRequest
+from zope.interface import implementer
+from zope.interface import Interface
+
+import unittest
+import z3c.caching.registry
+
 
 class DummyView(object):
     pass

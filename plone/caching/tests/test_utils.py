@@ -1,16 +1,18 @@
-import unittest
+from plone.caching.interfaces import ICachingOperationType
+from plone.caching.utils import lookupOption
+from plone.caching.utils import lookupOptions
+from plone.registry import field
+from plone.registry import FieldRef
+from plone.registry import Record
+from plone.registry import Registry
+from plone.registry.interfaces import IRegistry
+from zope.component import getUtility
+from zope.component import provideUtility
+from zope.interface import provider
 
+import unittest
 import zope.component.testing
 
-from zope.interface import provider
-from zope.component import provideUtility, getUtility
-
-from plone.registry.interfaces import IRegistry
-from plone.registry import Registry, Record, FieldRef
-from plone.registry import field
-
-from plone.caching.interfaces import ICachingOperationType
-from plone.caching.utils import lookupOption, lookupOptions
 
 _marker = object()
 

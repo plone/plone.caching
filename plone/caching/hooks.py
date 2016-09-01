@@ -1,24 +1,20 @@
-import logging
-
+from plone.caching.interfaces import X_CACHE_OPERATION_HEADER
+from plone.caching.interfaces import X_CACHE_RULE_HEADER
+from plone.caching.utils import findOperation
+from plone.transformchain.interfaces import DISABLE_TRANSFORM_REQUEST_KEY
+from plone.transformchain.interfaces import ITransform
+from ZODB.POSException import ConflictError
+from zope.component import adapter
+from zope.component import adapts
+from zope.globalrequest import getRequest
+from zope.interface import alsoProvides
 from zope.interface import implementer
 from zope.interface import Interface
-from zope.interface import alsoProvides
-
-from zope.component import adapts, adapter
-
-from zope.globalrequest import getRequest
-
 from ZPublisher.interfaces import IPubAfterTraversal
 from ZPublisher.interfaces import IPubBeforeStreaming
-from ZODB.POSException import ConflictError
 
-from plone.transformchain.interfaces import ITransform
-from plone.transformchain.interfaces import DISABLE_TRANSFORM_REQUEST_KEY
+import logging
 
-from plone.caching.interfaces import X_CACHE_RULE_HEADER
-from plone.caching.interfaces import X_CACHE_OPERATION_HEADER
-
-from plone.caching.utils import findOperation
 
 logger = logging.getLogger('plone.caching')
 

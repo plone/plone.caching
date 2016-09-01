@@ -6,7 +6,6 @@ from plone.transformchain.interfaces import DISABLE_TRANSFORM_REQUEST_KEY
 from plone.transformchain.interfaces import ITransform
 from ZODB.POSException import ConflictError
 from zope.component import adapter
-from zope.component import adapts
 from zope.globalrequest import getRequest
 from zope.interface import alsoProvides
 from zope.interface import implementer
@@ -118,6 +117,7 @@ def intercept(event):
 
 
 @implementer(ITransform)
+@adapter(Interface, Interface)
 class MutatorTransform(object):
     """Transformation using plone.transformchain.
 
@@ -132,7 +132,6 @@ class MutatorTransform(object):
     response body. Instead, we look up caching operations which can modify
     response headers and perform other caching functions.
     """
-    adapts(Interface, Interface)
 
     order = 12000
 

@@ -3,7 +3,7 @@ from plone.caching.interfaces import _
 from plone.caching.interfaces import ICachingOperation
 from plone.caching.interfaces import ICachingOperationType
 from plone.caching.utils import lookupOptions
-from zope.component import adapts
+from zope.component import adapter
 from zope.component import queryMultiAdapter
 from zope.interface import implementer
 from zope.interface import Interface
@@ -12,6 +12,7 @@ from zope.interface import provider
 
 @implementer(ICachingOperation)
 @provider(ICachingOperationType)
+@adapter(Interface, Interface)
 class Chain(object):
     """Caching operation which chains together several other operations.
 
@@ -26,8 +27,6 @@ class Chain(object):
 
     The option must be a sequence type (e.g. a ``Tuple``).
     """
-    adapts(Interface, Interface)
-
     title = _(u"Chain")
     description = _(u"Allows multiple operations to be chained together")
     prefix = 'plone.caching.operations.chain'

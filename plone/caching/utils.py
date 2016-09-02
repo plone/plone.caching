@@ -1,14 +1,15 @@
-import types
-
-from zope.component import queryUtility, getUtility
-from zope.component import queryMultiAdapter
-
-from plone.registry.interfaces import IRegistry
-
+# -*- coding: utf-8 -*-
+from plone.caching.interfaces import ICacheSettings
 from plone.caching.interfaces import ICachingOperation
 from plone.caching.interfaces import ICachingOperationType
 from plone.caching.interfaces import IRulesetLookup
-from plone.caching.interfaces import ICacheSettings
+from plone.registry.interfaces import IRegistry
+from zope.component import getUtility
+from zope.component import queryMultiAdapter
+from zope.component import queryUtility
+
+import types
+
 
 def lookupOptions(type_, rulename, default=None):
     """Look up all options for a given caching operation type, returning
@@ -30,9 +31,16 @@ def lookupOptions(type_, rulename, default=None):
     registry = queryUtility(IRegistry)
 
     for option in getattr(type_, 'options', ()):
-        options[option] = lookupOption(type_.prefix, rulename, option, default, registry)
+        options[option] = lookupOption(
+            type_.prefix,
+            rulename,
+            option,
+            default,
+            registry
+        )
 
     return options
+
 
 def lookupOption(prefix, rulename, option, default=None, _registry=None):
     """Look up an option for a particular caching operation.
@@ -48,7 +56,8 @@ def lookupOption(prefix, rulename, option, default=None, _registry=None):
     override.
     """
 
-    # Avoid looking this up multiple times if we are being called from lookupOptions
+    # Avoid looking this up multiple times if we are being called
+    # from lookupOptions
     registry = _registry
 
     if registry is None:
@@ -57,15 +66,16 @@ def lookupOption(prefix, rulename, option, default=None, _registry=None):
     if registry is None:
         return default
 
-    key = "%s.%s.%s" % (prefix, rulename, option,)
+    key = '.'.join((prefix, rulename, option,))
     if key in registry:
         return registry[key]
 
-    key = "%s.%s" % (prefix, option,)
+    key = '.'.join((prefix, option,))
     if key in registry:
         return registry[key]
 
     return default
+
 
 def findOperation(request):
 
@@ -102,5 +112,9 @@ def findOperation(request):
     if operationName is None:
         return rule, None, None
 
-    operation = queryMultiAdapter((published, request), ICachingOperation, name=operationName)
+    operation = queryMultiAdapter(
+        (published, request),
+        ICachingOperation,
+        name=operationName
+    )
     return rule, operationName, operation

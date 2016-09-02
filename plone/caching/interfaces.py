@@ -1,33 +1,37 @@
+# -*- coding: utf-8 -*-
+from zope import schema
+from zope.interface import Interface
+
 import zope.i18nmessageid
 
-from zope.interface import Interface
-from zope import schema
 
 _ = zope.i18nmessageid.MessageFactory('plone')
 
-X_CACHE_RULE_HEADER      = 'X-Cache-Rule'
+X_CACHE_RULE_HEADER = 'X-Cache-Rule'
 X_CACHE_OPERATION_HEADER = 'X-Cache-Operation'
+
 
 class ICacheSettings(Interface):
     """Settings expected to be found in plone.registry
     """
 
     enabled = schema.Bool(
-            title=_(u"Globally enabled"),
-            description=_(u"If not set, no caching operations will be attempted"),
-            default=False,
-        )
+        title=_(u'Globally enabled'),
+        description=_(u'If not set, no caching operations will be attempted'),
+        default=False,
+    )
 
     operationMapping = schema.Dict(
-            title=_(u"Rule set/operation mapping"),
-            description=_(u"Maps rule set names to operation names"),
-            key_type=schema.DottedName(title=_(u"Rule set name")),
-            value_type=schema.DottedName(title=_(u"Caching operation name")),
-        )
+        title=_(u'Rule set/operation mapping'),
+        description=_(u'Maps rule set names to operation names'),
+        key_type=schema.DottedName(title=_(u'Rule set name')),
+        value_type=schema.DottedName(title=_(u'Caching operation name')),
+    )
 
 #
 #  Cache operations
 #
+
 
 class ICachingOperation(Interface):
     """Represents a caching operation, typically setting of response headers
@@ -73,19 +77,20 @@ class ICachingOperationType(Interface):
 
     The usual pattern is::
 
-        from zope.interface import implements, classProvides, Interface
-        from zope.component import adapts
-
         from plone.caching.interfaces import ICachingOperation
         from plone.caching.interfaces import ICachingOperationType
-
         from plone.caching.utils import lookupOptions
+        from zope.component import adapter
+        from zope.interface import implementer
+        from zope.interface import Interface
+        from zope.interface import provider
 
+
+        @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
+        @provider(ICachingOperationType)
         class SomeOperation(object):
-            implements(ICachingOperation)
-            adapts(Interface, Interface)
 
-            classProvides(ICachingOperationType)
             title = u"Some operation"
             description = u"Operation description"
             prefix = 'my.package.operation1'
@@ -115,36 +120,36 @@ class ICachingOperationType(Interface):
     """
 
     title = schema.TextLine(
-            title=_(u"Title"),
-            description=_(u"A descriptive title for the operation"),
-        )
+        title=_(u'Title'),
+        description=_(u'A descriptive title for the operation'),
+    )
 
     description = schema.Text(
-            title=_(u"Description"),
-            description=_(u"A longer description for the operaton"),
-            required=False,
-        )
+        title=_(u'Description'),
+        description=_(u'A longer description for the operaton'),
+        required=False,
+    )
 
     prefix = schema.DottedName(
-            title=_(u"Registry prefix"),
-            description=_(u"Prefix for records in the registry pertaining to "
-                          u"this operation. This, alongside the next "
-                          u"parameter, allows the user interface to present "
-                          u"relevant configuration options for this "
-                          u"operation."),
-            required=False,
-        )
+        title=_(u'Registry prefix'),
+        description=_(u'Prefix for records in the registry pertaining to '
+                      u'this operation. This, alongside the next '
+                      u'parameter, allows the user interface to present '
+                      u'relevant configuration options for this '
+                      u'operation.'),
+        required=False,
+    )
 
     options = schema.Tuple(
-            title=_(u"Registry options"),
-            description=_(u"A tuple of options which can be used to "
-                          u"configure this operation. An option is looked "
-                          u"up in the registry by concatenating the prefix "
-                          u"with the option name, optionally preceded by "
-                          u"the rule set name, to allow per-rule overrides."),
-            value_type=schema.DottedName(),
-            required=False,
-        )
+        title=_(u'Registry options'),
+        description=_(u'A tuple of options which can be used to '
+                      u'configure this operation. An option is looked '
+                      u'up in the registry by concatenating the prefix '
+                      u'with the option name, optionally preceded by '
+                      u'the rule set name, to allow per-rule overrides.'),
+        value_type=schema.DottedName(),
+        required=False,
+    )
 
 
 #

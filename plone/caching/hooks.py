@@ -1,26 +1,23 @@
-import logging
-
+# -*- coding: utf-8 -*-
+from plone.caching.interfaces import X_CACHE_OPERATION_HEADER
+from plone.caching.interfaces import X_CACHE_RULE_HEADER
+from plone.caching.utils import findOperation
+from plone.transformchain.interfaces import DISABLE_TRANSFORM_REQUEST_KEY
+from plone.transformchain.interfaces import ITransform
+from ZODB.POSException import ConflictError
+from zope.component import adapter
+from zope.globalrequest import getRequest
+from zope.interface import alsoProvides
 from zope.interface import implementer
 from zope.interface import Interface
-from zope.interface import alsoProvides
-
-from zope.component import adapts, adapter
-
-from zope.globalrequest import getRequest
-
 from ZPublisher.interfaces import IPubAfterTraversal
 from ZPublisher.interfaces import IPubBeforeStreaming
-from ZODB.POSException import ConflictError
 
-from plone.transformchain.interfaces import ITransform
-from plone.transformchain.interfaces import DISABLE_TRANSFORM_REQUEST_KEY
+import logging
 
-from plone.caching.interfaces import X_CACHE_RULE_HEADER
-from plone.caching.interfaces import X_CACHE_OPERATION_HEADER
-
-from plone.caching.utils import findOperation
 
 logger = logging.getLogger('plone.caching')
+
 
 class IStreamedResponse(Interface):
     """Marker applied when we intercepted a streaming response. This allows
@@ -28,6 +25,7 @@ class IStreamedResponse(Interface):
     be executed for streaming responses (albeit on a seemingly empty body,
     and after the response has been sent).
     """
+
 
 class Intercepted(Exception):
     """Exception raised in order to abort regular processing before the
@@ -42,6 +40,7 @@ class Intercepted(Exception):
         self.status = status
         self.responseBody = responseBody
 
+
 class InterceptorResponse(object):
     """View for the Intercepted exception, serving to return an empty
     response in the case of an intercepted response.
@@ -53,6 +52,7 @@ class InterceptorResponse(object):
 
     def __call__(self):
         return self.context.responseBody
+
 
 @adapter(IPubAfterTraversal)
 def intercept(event):
@@ -68,25 +68,29 @@ def intercept(event):
     try:
         request = event.request
         published = request.get('PUBLISHED', None)
-
         rule, operationName, operation = findOperation(request)
 
         if rule is None:
             return
 
         request.response.setHeader(X_CACHE_RULE_HEADER, rule)
-        logger.debug("Published: %s Ruleset: %s Operation: %s", repr(published), rule, operation)
+        logger.debug(
+            'Published: %s Ruleset: %s Operation: %s',
+            repr(published),
+            rule,
+            operation
+        )
 
         if operation is not None:
-
             responseBody = operation.interceptResponse(rule, request.response)
 
             if responseBody is not None:
-
                 # Only put this in the response if the operation actually
                 # intercepted something
-
-                request.response.setHeader(X_CACHE_OPERATION_HEADER, operationName)
+                request.response.setHeader(
+                    X_CACHE_OPERATION_HEADER,
+                    operationName
+                )
 
                 # Stop any post-processing, including the operation's response
                 # modification
@@ -105,10 +109,15 @@ def intercept(event):
         raise
     except Intercepted:
         raise
-    except:
-        logging.exception("Swallowed exception in plone.caching IPubAfterTraversal event handler")
+    except Exception:
+        logging.exception(
+            'Swallowed exception in plone.caching IPubAfterTraversal event '
+            'handler'
+        )
+
 
 @implementer(ITransform)
+@adapter(Interface, Interface)
 class MutatorTransform(object):
     """Transformation using plone.transformchain.
 
@@ -123,7 +132,6 @@ class MutatorTransform(object):
     response body. Instead, we look up caching operations which can modify
     response headers and perform other caching functions.
     """
-    adapts(Interface, Interface)
 
     order = 12000
 
@@ -144,7 +152,6 @@ class MutatorTransform(object):
         return None
 
     def mutate(self):
-
         request = self.request
 
         # Abort if this was a streamed request handled by our event handler
@@ -153,22 +160,26 @@ class MutatorTransform(object):
             return
 
         published = request.get('PUBLISHED', None)
-
         rule, operationName, operation = findOperation(request)
 
         if rule is None:
             return
 
         request.response.setHeader(X_CACHE_RULE_HEADER, rule)
-        logger.debug("Published: %s Ruleset: %s Operation: %s", repr(published), rule, operation)
+        logger.debug(
+            'Published: %s Ruleset: %s Operation: %s',
+            repr(published),
+            rule,
+            operation
+        )
 
         if operation is not None:
-
             request.response.setHeader(X_CACHE_OPERATION_HEADER, operationName)
             operation.modifyResponse(rule, request.response)
 
 # Hook for streaming responses - does not use plone.transformchain, since
 # sequencing is less likely to be an issue here
+
 
 @adapter(IPubBeforeStreaming)
 def modifyStreamingResponse(event):
@@ -196,9 +207,13 @@ def modifyStreamingResponse(event):
         return
 
     response.setHeader(X_CACHE_RULE_HEADER, rule)
-    logger.debug("Published: %s Ruleset: %s Operation: %s", repr(published), rule, operation)
+    logger.debug(
+        'Published: %s Ruleset: %s Operation: %s',
+        repr(published),
+        rule,
+        operation
+    )
 
     if operation is not None:
-
         response.setHeader(X_CACHE_OPERATION_HEADER, operationName)
         operation.modifyResponse(rule, response)

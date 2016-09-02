@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 from plone.testing import Layer
 from plone.testing.zca import UNIT_TESTING
 from z3c.caching.registry import getGlobalRulesetRegistry
 from z3c.caching.registry import RulesetRegistry
 from zope.component import provideAdapter
+
 import zope.component.testing
 
 

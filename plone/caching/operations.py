@@ -1,14 +1,18 @@
-from zope.interface import implementer, provider, Interface
-from zope.component import adapts, queryMultiAdapter
-
+# -*- coding: utf-8 -*-
+from plone.caching.interfaces import _
 from plone.caching.interfaces import ICachingOperation
 from plone.caching.interfaces import ICachingOperationType
-from plone.caching.interfaces import _
-
 from plone.caching.utils import lookupOptions
+from zope.component import adapter
+from zope.component import queryMultiAdapter
+from zope.interface import implementer
+from zope.interface import Interface
+from zope.interface import provider
+
 
 @implementer(ICachingOperation)
 @provider(ICachingOperationType)
+@adapter(Interface, Interface)
 class Chain(object):
     """Caching operation which chains together several other operations.
 
@@ -23,8 +27,6 @@ class Chain(object):
 
     The option must be a sequence type (e.g. a ``Tuple``).
     """
-    adapts(Interface, Interface)
-
     title = _(u"Chain")
     description = _(u"Allows multiple operations to be chained together")
     prefix = 'plone.caching.operations.chain'
@@ -42,15 +44,21 @@ class Chain(object):
         if options['operations']:
             for name in options['operations']:
 
-                operation = queryMultiAdapter((self.published, self.request),
-                                             ICachingOperation, name=name)
+                operation = queryMultiAdapter(
+                    (self.published, self.request),
+                    ICachingOperation,
+                    name=name
+                )
 
                 if operation is not None:
                     chained.append(name)
 
                     value = operation.interceptResponse(rulename, response)
                     if value is not None:
-                        response.setHeader('X-Cache-Chain-Operations', '; '.join(chained))
+                        response.setHeader(
+                            'X-Cache-Chain-Operations',
+                            '; '.join(chained)
+                        )
                         return value
 
     def modifyResponse(self, rulename, response):
@@ -61,8 +69,11 @@ class Chain(object):
         if options['operations']:
             for name in options['operations']:
 
-                operation = queryMultiAdapter((self.published, self.request),
-                                             ICachingOperation, name=name)
+                operation = queryMultiAdapter(
+                    (self.published, self.request),
+                    ICachingOperation,
+                    name=name
+                )
 
                 if operation is not None:
                     chained.append(name)

@@ -1,39 +1,39 @@
-import unittest
-
-from zope.component import adapts, provideUtility, provideAdapter, getUtility
-from zope.interface import implementer, Interface
-
-from zope.globalrequest import setRequest, clearRequest
-
-import z3c.caching.registry
-
-from plone.registry.interfaces import IRegistry
-
-from plone.registry import Registry
-from plone.registry.fieldfactory import persistentFieldAdapter
-
-from plone.caching.interfaces import IRulesetLookup
-from plone.caching.interfaces import ICachingOperation
-from plone.caching.interfaces import ICacheSettings
-
-from plone.caching.lookup import DefaultRulesetLookup
-
-from plone.caching.hooks import MutatorTransform
+# -*- coding: utf-8 -*-
 from plone.caching.hooks import intercept
-from plone.caching.hooks import modifyStreamingResponse
 from plone.caching.hooks import Intercepted
 from plone.caching.hooks import InterceptorResponse
-
+from plone.caching.hooks import modifyStreamingResponse
+from plone.caching.hooks import MutatorTransform
+from plone.caching.interfaces import ICacheSettings
+from plone.caching.interfaces import ICachingOperation
+from plone.caching.interfaces import IRulesetLookup
+from plone.caching.lookup import DefaultRulesetLookup
 from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
-
+from plone.registry import Registry
+from plone.registry.fieldfactory import persistentFieldAdapter
+from plone.registry.interfaces import IRegistry
 from ZODB.POSException import ConflictError
+from zope.component import adapter
+from zope.component import getUtility
+from zope.component import provideAdapter
+from zope.component import provideUtility
+from zope.globalrequest import clearRequest
+from zope.globalrequest import setRequest
+from zope.interface import implementer
+from zope.interface import Interface
+
+import unittest
+import z3c.caching.registry
+
 
 class DummyView(object):
     pass
 
+
 class DummyResource(object):
     def index_html(self):
         return 'binary data'
+
 
 class DummyResponse(dict):
 
@@ -49,8 +49,10 @@ class DummyResponse(dict):
         self.status = value
         if lock is not None:
             self.locked = lock
+
     def getStatus(self):
         return self.status
+
 
 class DummyRequest(dict):
     def __init__(self, published, response):
@@ -58,13 +60,16 @@ class DummyRequest(dict):
         self.response = response
         self.environ = {}
 
+
 class DummyEvent(object):
     def __init__(self, request):
         self.request = request
 
+
 class DummyStreamingEvent(object):
     def __init__(self, response):
         self.response = response
+
 
 class TestMutateResponse(unittest.TestCase):
 
@@ -83,20 +88,20 @@ class TestMutateResponse(unittest.TestCase):
 
         request = DummyRequest(None, DummyResponse())
 
-        MutatorTransform(None, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(None, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': None}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': None}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_registry(self):
         provideAdapter(DefaultRulesetLookup)
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_records(self):
         provideAdapter(DefaultRulesetLookup)
@@ -104,10 +109,10 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_mapping(self):
         provideAdapter(DefaultRulesetLookup)
@@ -122,10 +127,10 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_cache_rule(self):
         provideAdapter(DefaultRulesetLookup)
@@ -140,10 +145,10 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_lookup_adapter(self):
         provideUtility(Registry(), IRegistry)
@@ -158,10 +163,10 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_operation_name_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -177,10 +182,13 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'X-Cache-Rule': ['testrule']},
+            dict(request.response)
+        )
 
     def test_operation_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -196,10 +204,13 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'X-Cache-Rule': ['testrule']},
+            dict(request.response)
+        )
 
     def test_match_unicode(self):
         provideAdapter(DefaultRulesetLookup)
@@ -213,8 +224,8 @@ class TestMutateResponse(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -226,17 +237,17 @@ class TestMutateResponse(unittest.TestCase):
             def modifyResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({'X-Cache-Rule': ['testrule'],
+                          'X-Cache-Operation': ['op1'],
+                          'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_match_bytes(self):
         provideAdapter(DefaultRulesetLookup)
@@ -250,8 +261,8 @@ class TestMutateResponse(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -263,17 +274,17 @@ class TestMutateResponse(unittest.TestCase):
             def modifyResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformBytes("", "utf-8")
+        MutatorTransform(view, request).transformBytes('', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({'X-Cache-Rule': ['testrule'],
+                          'X-Cache-Operation': ['op1'],
+                          'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_match_iterable(self):
         provideAdapter(DefaultRulesetLookup)
@@ -287,8 +298,8 @@ class TestMutateResponse(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -300,17 +311,17 @@ class TestMutateResponse(unittest.TestCase):
             def modifyResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformIterable([""], "utf-8")
+        MutatorTransform(view, request).transformIterable([''], 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({'X-Cache-Rule': ['testrule'],
+                          'X-Cache-Operation': ['op1'],
+                          'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_match_method(self):
         provideAdapter(DefaultRulesetLookup)
@@ -324,8 +335,8 @@ class TestMutateResponse(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -337,17 +348,17 @@ class TestMutateResponse(unittest.TestCase):
             def modifyResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         resource = DummyResource()
         request = DummyRequest(resource.index_html, DummyResponse())
 
-        MutatorTransform(resource, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(resource, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': resource.index_html}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
+        self.assertEqual({'X-Cache-Rule': ['testrule'],
+                          'X-Cache-Operation': ['op1'],
+                          'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_off_switch(self):
         provideAdapter(DefaultRulesetLookup)
@@ -361,8 +372,8 @@ class TestMutateResponse(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -374,15 +385,16 @@ class TestMutateResponse(unittest.TestCase):
             def modifyResponse(self, rulename, response):
                 response['X-Mutated'] = rulename
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u"", "utf-8")
+        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
+
 
 class TestMutateResponseStreaming(unittest.TestCase):
 
@@ -408,8 +420,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': None}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': None}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_registry(self):
         provideAdapter(DefaultRulesetLookup)
@@ -421,8 +433,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_records(self):
         provideAdapter(DefaultRulesetLookup)
@@ -435,8 +447,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_mapping(self):
         provideAdapter(DefaultRulesetLookup)
@@ -455,8 +467,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_cache_rule(self):
         provideAdapter(DefaultRulesetLookup)
@@ -475,8 +487,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_lookup_adapter(self):
         provideUtility(Registry(), IRegistry)
@@ -495,8 +507,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_operation_name_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -516,8 +528,11 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'X-Cache-Rule': ['testrule']},
+            dict(request.response)
+        )
 
     def test_operation_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -537,8 +552,11 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'X-Cache-Rule': ['testrule']},
+            dict(request.response)
+        )
 
     def test_match_unicode(self):
         provideAdapter(DefaultRulesetLookup)
@@ -552,8 +570,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -565,7 +583,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
             def modifyResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         response = DummyResponse()
@@ -574,10 +592,10 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({'X-Cache-Rule': ['testrule'],
+                          'X-Cache-Operation': ['op1'],
+                          'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_match_bytes(self):
         provideAdapter(DefaultRulesetLookup)
@@ -591,8 +609,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -604,7 +622,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
             def modifyResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         response = DummyResponse()
@@ -613,10 +631,10 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({'X-Cache-Rule': ['testrule'],
+                          'X-Cache-Operation': ['op1'],
+                          'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_match_iterable(self):
         provideAdapter(DefaultRulesetLookup)
@@ -630,8 +648,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -643,7 +661,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
             def modifyResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         response = DummyResponse()
@@ -652,10 +670,10 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({'X-Cache-Rule': ['testrule'],
+                          'X-Cache-Operation': ['op1'],
+                          'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_match_method(self):
         provideAdapter(DefaultRulesetLookup)
@@ -669,8 +687,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -682,7 +700,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
             def modifyResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         resource = DummyResource()
         response = DummyResponse()
@@ -691,10 +709,10 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': resource.index_html}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
+        self.assertEqual({'X-Cache-Rule': ['testrule'],
+                          'X-Cache-Operation': ['op1'],
+                          'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_off_switch(self):
         provideAdapter(DefaultRulesetLookup)
@@ -708,8 +726,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -721,7 +739,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
             def modifyResponse(self, rulename, response):
                 response['X-Mutated'] = rulename
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         response = DummyResponse()
@@ -730,8 +748,9 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
+
 
 class TestIntercept(unittest.TestCase):
 
@@ -751,8 +770,8 @@ class TestIntercept(unittest.TestCase):
         request = DummyRequest(None, DummyResponse())
 
         intercept(DummyEvent(request))
-        self.assertEquals({'PUBLISHED': None}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': None}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_registry(self):
         provideAdapter(DefaultRulesetLookup)
@@ -761,8 +780,8 @@ class TestIntercept(unittest.TestCase):
 
         intercept(DummyEvent(request))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_records(self):
         provideAdapter(DefaultRulesetLookup)
@@ -773,8 +792,8 @@ class TestIntercept(unittest.TestCase):
 
         intercept(DummyEvent(request))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_cache_rule(self):
         provideAdapter(DefaultRulesetLookup)
@@ -790,8 +809,8 @@ class TestIntercept(unittest.TestCase):
         request = DummyRequest(view, DummyResponse())
         intercept(DummyEvent(request))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_no_mapping(self):
         provideAdapter(DefaultRulesetLookup)
@@ -809,8 +828,8 @@ class TestIntercept(unittest.TestCase):
         request = DummyRequest(view, DummyResponse())
         intercept(DummyEvent(request))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_operation_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -827,8 +846,11 @@ class TestIntercept(unittest.TestCase):
         request = DummyRequest(view, DummyResponse())
         intercept(DummyEvent(request))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'X-Cache-Rule': ['testrule']},
+            dict(request.response)
+        )
 
     def test_match_abort(self):
         provideAdapter(DefaultRulesetLookup)
@@ -842,8 +864,8 @@ class TestIntercept(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -856,15 +878,15 @@ class TestIntercept(unittest.TestCase):
                 response.addHeader('X-Cache-Foo', 'test')
                 return None
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
         intercept(DummyEvent(request))
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({'X-Cache-Rule': ['testrule'],
+                          'X-Cache-Foo': ['test']}, dict(request.response))
 
     def test_match_body(self):
         provideAdapter(DefaultRulesetLookup)
@@ -878,8 +900,8 @@ class TestIntercept(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -891,9 +913,9 @@ class TestIntercept(unittest.TestCase):
             def interceptResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
                 response.setStatus(304)
-                return u"dummy"
+                return u'dummy'
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -901,18 +923,24 @@ class TestIntercept(unittest.TestCase):
             intercept(DummyEvent(request))
             self.fail()
         except Intercepted, e:
-            self.assertEquals(u"dummy", e.responseBody)
-            self.assertEquals(304, e.status)
-            self.assertEquals(304, request.response.status)
-            self.assertEquals(True, request.response.locked)
+            self.assertEqual(u'dummy', e.responseBody)
+            self.assertEqual(304, e.status)
+            self.assertEqual(304, request.response.status)
+            self.assertEqual(True, request.response.locked)
         except Exception, e:
             self.fail(str(e))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'plone.transformchain.disable': True}, request.environ)
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'plone.transformchain.disable': True},
+            request.environ
+        )
+        self.assertEqual(
+            {'X-Cache-Rule': ['testrule'],
+             'X-Cache-Operation': ['op1'],
+             'X-Cache-Foo': ['test']},
+            dict(request.response)
+        )
 
     def test_match_body_explicitly_enable_transform_chain(self):
         provideAdapter(DefaultRulesetLookup)
@@ -926,8 +954,8 @@ class TestIntercept(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -940,9 +968,9 @@ class TestIntercept(unittest.TestCase):
                 response.addHeader('X-Cache-Foo', 'test')
                 response.setStatus(304)
                 self.request.environ['plone.transformchain.disable'] = False
-                return u"dummy"
+                return u'dummy'
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -950,18 +978,24 @@ class TestIntercept(unittest.TestCase):
             intercept(DummyEvent(request))
             self.fail()
         except Intercepted, e:
-            self.assertEquals(u"dummy", e.responseBody)
-            self.assertEquals(304, e.status)
-            self.assertEquals(304, request.response.status)
-            self.assertEquals(True, request.response.locked)
+            self.assertEqual(u'dummy', e.responseBody)
+            self.assertEqual(304, e.status)
+            self.assertEqual(304, request.response.status)
+            self.assertEqual(True, request.response.locked)
         except Exception, e:
             self.fail(str(e))
 
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({'plone.transformchain.disable': False}, request.environ)
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual(
+            {'plone.transformchain.disable': False},
+            request.environ
+        )
+        self.assertEqual(
+            {'X-Cache-Rule': ['testrule'],
+             'X-Cache-Operation': ['op1'],
+             'X-Cache-Foo': ['test']},
+            dict(request.response)
+        )
 
     def test_match_body_method(self):
         provideAdapter(DefaultRulesetLookup)
@@ -975,8 +1009,8 @@ class TestIntercept(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -988,9 +1022,9 @@ class TestIntercept(unittest.TestCase):
             def interceptResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
                 response.setStatus(200)
-                return u"dummy"
+                return u'dummy'
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         resource = DummyResource()
         request = DummyRequest(resource.index_html, DummyResponse())
@@ -998,18 +1032,24 @@ class TestIntercept(unittest.TestCase):
             intercept(DummyEvent(request))
             self.fail()
         except Intercepted, e:
-            self.assertEquals(u"dummy", e.responseBody)
-            self.assertEquals(200, e.status)
-            self.assertEquals(200, request.response.status)
-            self.assertEquals(True, request.response.locked)
+            self.assertEqual(u'dummy', e.responseBody)
+            self.assertEqual(200, e.status)
+            self.assertEqual(200, request.response.status)
+            self.assertEqual(True, request.response.locked)
         except Exception, e:
             self.fail(str(e))
 
-        self.assertEquals({'PUBLISHED': resource.index_html}, dict(request))
-        self.assertEquals({'plone.transformchain.disable': True}, request.environ)
-        self.assertEquals({'X-Cache-Rule': ['testrule'],
-                           'X-Cache-Operation': ['op1'],
-                           'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
+        self.assertEqual(
+            {'plone.transformchain.disable': True},
+            request.environ
+        )
+        self.assertEqual(
+            {'X-Cache-Rule': ['testrule'],
+             'X-Cache-Operation': ['op1'],
+             'X-Cache-Foo': ['test']},
+            dict(request.response)
+        )
 
     def test_off_switch(self):
         provideAdapter(DefaultRulesetLookup)
@@ -1023,8 +1063,8 @@ class TestIntercept(unittest.TestCase):
         settings.operationMapping = {'testrule': 'op1'}
 
         @implementer(ICachingOperation)
+        @adapter(Interface, Interface)
         class DummyOperation(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -1035,21 +1075,21 @@ class TestIntercept(unittest.TestCase):
 
             def interceptResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
-                return u"dummy"
+                return u'dummy'
 
-        provideAdapter(DummyOperation, name="op1")
+        provideAdapter(DummyOperation, name='op1')
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         intercept(DummyEvent(request))
-        self.assertEquals({'PUBLISHED': view}, dict(request))
-        self.assertEquals({}, dict(request.response))
+        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({}, dict(request.response))
 
     def test_dont_swallow_conflict_error(self):
 
         @implementer(IRulesetLookup)
+        @adapter(Interface, Interface)
         class DummyRulesetLookup(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
@@ -1074,15 +1114,15 @@ class TestIntercept(unittest.TestCase):
     def test_swallow_other_error(self):
 
         @implementer(IRulesetLookup)
+        @adapter(Interface, Interface)
         class DummyRulesetLookup(object):
-            adapts(Interface, Interface)
 
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def __call__(self):
-                raise AttributeError("Should be swallowed and logged")
+                raise AttributeError('Should be swallowed and logged')
 
         provideAdapter(DummyRulesetLookup)
 
@@ -1098,15 +1138,16 @@ class TestIntercept(unittest.TestCase):
 
         try:
             intercept(DummyEvent(request))
-        except:
-            self.fail("Intercept should not raise")
+        except Exception:
+            self.fail('Intercept should not raise')
 
     def test_exception_view(self):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        exc = Intercepted(status=200, responseBody=u"Test")
+        exc = Intercepted(status=200, responseBody=u'Test')
         excView = InterceptorResponse(exc, request)
-        self.assertEquals(u"Test", excView())
+        self.assertEqual(u'Test', excView())
+
 
 def test_suite():
     return unittest.defaultTestLoader.loadTestsFromName(__name__)

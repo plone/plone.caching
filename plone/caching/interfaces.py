@@ -28,6 +28,7 @@ class ICacheSettings(Interface):
         value_type=schema.DottedName(title=_(u'Caching operation name')),
     )
 
+
 #
 #  Cache operations
 #
@@ -70,6 +71,7 @@ class ICachingOperation(Interface):
 #
 # Cache operation *types* (for UI support)
 #
+
 
 class ICachingOperationType(Interface):
     """A named utility which is used to provide UI support for caching
@@ -132,21 +134,25 @@ class ICachingOperationType(Interface):
 
     prefix = schema.DottedName(
         title=_(u'Registry prefix'),
-        description=_(u'Prefix for records in the registry pertaining to '
-                      u'this operation. This, alongside the next '
-                      u'parameter, allows the user interface to present '
-                      u'relevant configuration options for this '
-                      u'operation.'),
+        description=_(
+            u'Prefix for records in the registry pertaining to '
+            u'this operation. This, alongside the next '
+            u'parameter, allows the user interface to present '
+            u'relevant configuration options for this '
+            u'operation.'
+        ),
         required=False,
     )
 
     options = schema.Tuple(
         title=_(u'Registry options'),
-        description=_(u'A tuple of options which can be used to '
-                      u'configure this operation. An option is looked '
-                      u'up in the registry by concatenating the prefix '
-                      u'with the option name, optionally preceded by '
-                      u'the rule set name, to allow per-rule overrides.'),
+        description=_(
+            u'A tuple of options which can be used to '
+            u'configure this operation. An option is looked '
+            u'up in the registry by concatenating the prefix '
+            u'with the option name, optionally preceded by '
+            u'the rule set name, to allow per-rule overrides.'
+        ),
         value_type=schema.DottedName(),
         required=False,
     )
@@ -155,6 +161,7 @@ class ICachingOperationType(Interface):
 #
 # Internal abstractions
 #
+
 
 class IRulesetLookup(Interface):
     """Abstraction for the lookup of response rulesets from published objects.

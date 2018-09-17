@@ -11,7 +11,6 @@ class DummyView(object):
 
 
 class DummyResponse(dict):
-
     def addHeader(self, name, value):
         self.setdefault(name, []).append(value)
 

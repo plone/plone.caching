@@ -78,7 +78,7 @@ def intercept(event):
             'Published: %s Ruleset: %s Operation: %s',
             repr(published),
             rule,
-            operation
+            operation,
         )
 
         if operation is not None:
@@ -88,8 +88,7 @@ def intercept(event):
                 # Only put this in the response if the operation actually
                 # intercepted something
                 request.response.setHeader(
-                    X_CACHE_OPERATION_HEADER,
-                    operationName
+                    X_CACHE_OPERATION_HEADER, operationName
                 )
 
                 # Stop any post-processing, including the operation's response
@@ -170,12 +169,13 @@ class MutatorTransform(object):
             'Published: %s Ruleset: %s Operation: %s',
             repr(published),
             rule,
-            operation
+            operation,
         )
 
         if operation is not None:
             request.response.setHeader(X_CACHE_OPERATION_HEADER, operationName)
             operation.modifyResponse(rule, request.response)
+
 
 # Hook for streaming responses - does not use plone.transformchain, since
 # sequencing is less likely to be an issue here
@@ -211,7 +211,7 @@ def modifyStreamingResponse(event):
         'Published: %s Ruleset: %s Operation: %s',
         repr(published),
         rule,
-        operation
+        operation,
     )
 
     if operation is not None:

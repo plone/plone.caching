@@ -61,7 +61,7 @@ class TestChain(unittest.TestCase):
 
         self.registry.records[
             '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List())
+        ] = Record(field.List(value_type=field.Text()))
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -78,7 +78,7 @@ class TestChain(unittest.TestCase):
 
         self.registry.records[
             '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(), [])
+        ] = Record(field.List(value_type=field.Text()), [])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -95,7 +95,7 @@ class TestChain(unittest.TestCase):
 
         self.registry.records[
             '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(), ['op1'])
+        ] = Record(field.List(value_type=field.Text()), [u'op1'])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -109,7 +109,7 @@ class TestChain(unittest.TestCase):
     def test_multiple_operations_one_found(self):
         self.registry.records[
             '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(), ['op1', 'op2'])
+        ] = Record(field.List(value_type=field.Text()), [u'op1', u'op2'])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -154,7 +154,7 @@ class TestChain(unittest.TestCase):
     def test_multiple_operations_multiple_found(self):
         self.registry.records[
             '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(), ['op1', 'op2'])
+        ] = Record(field.List(value_type=field.Text()), [u'op1', u'op2'])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())

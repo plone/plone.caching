@@ -14,7 +14,7 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Fix caching and tests in python 3 [ale-rt, pbauer]
 
 
 1.1.2 (2016-09-16)

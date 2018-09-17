@@ -32,11 +32,7 @@ def lookupOptions(type_, rulename, default=None):
 
     for option in getattr(type_, 'options', ()):
         options[option] = lookupOption(
-            type_.prefix,
-            rulename,
-            option,
-            default,
-            registry
+            type_.prefix, rulename, option, default, registry
         )
 
     return options
@@ -66,11 +62,11 @@ def lookupOption(prefix, rulename, option, default=None, _registry=None):
     if registry is None:
         return default
 
-    key = '.'.join((prefix, rulename, option,))
+    key = '.'.join((prefix, rulename, option))
     if key in registry:
         return registry[key]
 
-    key = '.'.join((prefix, option,))
+    key = '.'.join((prefix, option))
     if key in registry:
         return registry[key]
 
@@ -98,7 +94,7 @@ def findOperation(request):
     if settings.operationMapping is None:
         return None, None, None
 
-    lookup = queryMultiAdapter((published, request,), IRulesetLookup)
+    lookup = queryMultiAdapter((published, request), IRulesetLookup)
     if lookup is None:
         return None, None, None
 
@@ -113,8 +109,6 @@ def findOperation(request):
         return rule, None, None
 
     operation = queryMultiAdapter(
-        (published, request),
-        ICachingOperation,
-        name=operationName
+        (published, request), ICachingOperation, name=operationName
     )
     return rule, operationName, operation

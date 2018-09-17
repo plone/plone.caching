@@ -23,7 +23,6 @@ class DummyView(object):
 
 
 class DummyResponse(dict):
-
     def addHeader(self, name, value):
         self.setdefault(name, []).append(value)
 
@@ -59,9 +58,9 @@ class TestChain(unittest.TestCase):
 
     def test_operations_list_not_set(self):
 
-        self.registry.records[
-            '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(value_type=field.Text()))
+        self.registry.records['{0}.operations'.format(Chain.prefix)] = Record(
+            field.List(value_type=field.Text())
+        )
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -76,9 +75,9 @@ class TestChain(unittest.TestCase):
 
     def test_operations_empty(self):
 
-        self.registry.records[
-            '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(value_type=field.Text()), [])
+        self.registry.records['{0}.operations'.format(Chain.prefix)] = Record(
+            field.List(value_type=field.Text()), []
+        )
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -93,9 +92,9 @@ class TestChain(unittest.TestCase):
 
     def test_chained_operations_not_found(self):
 
-        self.registry.records[
-            '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(value_type=field.Text()), [u'op1'])
+        self.registry.records['{0}.operations'.format(Chain.prefix)] = Record(
+            field.List(value_type=field.Text()), [u'op1']
+        )
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -107,9 +106,9 @@ class TestChain(unittest.TestCase):
         self.assertEqual({}, dict(request.response))
 
     def test_multiple_operations_one_found(self):
-        self.registry.records[
-            '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(value_type=field.Text()), [u'op1', u'op2'])
+        self.registry.records['{0}.operations'.format(Chain.prefix)] = Record(
+            field.List(value_type=field.Text()), [u'op1', u'op2']
+        )
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -117,7 +116,6 @@ class TestChain(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -136,8 +134,7 @@ class TestChain(unittest.TestCase):
         self.assertEqual(u'foo', ret)
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual(
-            {'X-Cache-Chain-Operations': 'op2'},
-            dict(request.response)
+            {'X-Cache-Chain-Operations': 'op2'}, dict(request.response)
         )
 
         request = DummyRequest(view, DummyResponse())
@@ -146,15 +143,14 @@ class TestChain(unittest.TestCase):
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual(
-            {'X-Mutated': 'testrule',
-             'X-Cache-Chain-Operations': 'op2'},
-            dict(request.response)
+            {'X-Mutated': 'testrule', 'X-Cache-Chain-Operations': 'op2'},
+            dict(request.response),
         )
 
     def test_multiple_operations_multiple_found(self):
-        self.registry.records[
-            '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(value_type=field.Text()), [u'op1', u'op2'])
+        self.registry.records['{0}.operations'.format(Chain.prefix)] = Record(
+            field.List(value_type=field.Text()), [u'op1', u'op2']
+        )
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -162,7 +158,6 @@ class TestChain(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation1(object):
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -178,7 +173,6 @@ class TestChain(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation2(object):
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -197,8 +191,7 @@ class TestChain(unittest.TestCase):
         self.assertEqual(u'foo', ret)
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual(
-            {'X-Cache-Chain-Operations': 'op1'},
-            dict(request.response)
+            {'X-Cache-Chain-Operations': 'op1'}, dict(request.response)
         )
 
         request = DummyRequest(view, DummyResponse())
@@ -207,10 +200,12 @@ class TestChain(unittest.TestCase):
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual(
-            {'X-Mutated-1': 'testrule',
-             'X-Mutated-2': 'testrule',
-             'X-Cache-Chain-Operations': 'op1; op2'},
-            dict(request.response)
+            {
+                'X-Mutated-1': 'testrule',
+                'X-Mutated-2': 'testrule',
+                'X-Cache-Chain-Operations': 'op1; op2',
+            },
+            dict(request.response),
         )
 
 

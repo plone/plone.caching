@@ -31,6 +31,7 @@ class DummyView(object):
 
 
 class DummyResource(object):
+
     def index_html(self):
         return b'binary data'
 
@@ -55,6 +56,7 @@ class DummyResponse(dict):
 
 
 class DummyRequest(dict):
+
     def __init__(self, published, response):
         self['PUBLISHED'] = published
         self.response = response
@@ -62,11 +64,13 @@ class DummyRequest(dict):
 
 
 class DummyEvent(object):
+
     def __init__(self, request):
         self.request = request
 
 
 class DummyStreamingEvent(object):
+
     def __init__(self, response):
         self.response = response
 
@@ -185,10 +189,9 @@ class TestMutateResponse(unittest.TestCase):
         MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule']},
-            dict(request.response)
-        )
+        self.assertEqual({
+            'X-Cache-Rule': ['testrule']
+        }, dict(request.response))
 
     def test_operation_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -207,10 +210,9 @@ class TestMutateResponse(unittest.TestCase):
         MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule']},
-            dict(request.response)
-        )
+        self.assertEqual({
+            'X-Cache-Rule': ['testrule']
+        }, dict(request.response))
 
     def test_match_unicode(self):
         provideAdapter(DefaultRulesetLookup)
@@ -245,9 +247,14 @@ class TestMutateResponse(unittest.TestCase):
         MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual(
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
+        )
 
     def test_match_bytes(self):
         provideAdapter(DefaultRulesetLookup)
@@ -282,9 +289,14 @@ class TestMutateResponse(unittest.TestCase):
         MutatorTransform(view, request).transformBytes('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual(
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
+        )
 
     def test_match_iterable(self):
         provideAdapter(DefaultRulesetLookup)
@@ -319,9 +331,14 @@ class TestMutateResponse(unittest.TestCase):
         MutatorTransform(view, request).transformIterable([''], 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual(
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
+        )
 
     def test_match_method(self):
         provideAdapter(DefaultRulesetLookup)
@@ -356,9 +373,14 @@ class TestMutateResponse(unittest.TestCase):
         MutatorTransform(resource, request).transformUnicode(u'', 'utf-8')
 
         self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual(
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
+        )
 
     def test_off_switch(self):
         provideAdapter(DefaultRulesetLookup)
@@ -529,10 +551,9 @@ class TestMutateResponseStreaming(unittest.TestCase):
         modifyStreamingResponse(DummyStreamingEvent(response))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule']},
-            dict(request.response)
-        )
+        self.assertEqual({
+            'X-Cache-Rule': ['testrule']
+        }, dict(request.response))
 
     def test_operation_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -553,10 +574,9 @@ class TestMutateResponseStreaming(unittest.TestCase):
         modifyStreamingResponse(DummyStreamingEvent(response))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule']},
-            dict(request.response)
-        )
+        self.assertEqual({
+            'X-Cache-Rule': ['testrule']
+        }, dict(request.response))
 
     def test_match_unicode(self):
         provideAdapter(DefaultRulesetLookup)
@@ -593,9 +613,14 @@ class TestMutateResponseStreaming(unittest.TestCase):
         modifyStreamingResponse(DummyStreamingEvent(response))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual(
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
+        )
 
     def test_match_bytes(self):
         provideAdapter(DefaultRulesetLookup)
@@ -632,9 +657,14 @@ class TestMutateResponseStreaming(unittest.TestCase):
         modifyStreamingResponse(DummyStreamingEvent(response))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual(
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
+        )
 
     def test_match_iterable(self):
         provideAdapter(DefaultRulesetLookup)
@@ -671,9 +701,14 @@ class TestMutateResponseStreaming(unittest.TestCase):
         modifyStreamingResponse(DummyStreamingEvent(response))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual(
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
+        )
 
     def test_match_method(self):
         provideAdapter(DefaultRulesetLookup)
@@ -710,9 +745,14 @@ class TestMutateResponseStreaming(unittest.TestCase):
         modifyStreamingResponse(DummyStreamingEvent(response))
 
         self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual(
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
+        )
 
     def test_off_switch(self):
         provideAdapter(DefaultRulesetLookup)
@@ -847,10 +887,9 @@ class TestIntercept(unittest.TestCase):
         intercept(DummyEvent(request))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule']},
-            dict(request.response)
-        )
+        self.assertEqual({
+            'X-Cache-Rule': ['testrule']
+        }, dict(request.response))
 
     def test_match_abort(self):
         provideAdapter(DefaultRulesetLookup)
@@ -885,8 +924,13 @@ class TestIntercept(unittest.TestCase):
 
         intercept(DummyEvent(request))
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual(
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Foo': ['test']
+            },
+            dict(request.response),
+        )
 
     def test_match_body(self):
         provideAdapter(DefaultRulesetLookup)
@@ -931,15 +975,16 @@ class TestIntercept(unittest.TestCase):
             self.fail(str(e))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({
+            'plone.transformchain.disable': True
+        }, request.environ)
         self.assertEqual(
-            {'plone.transformchain.disable': True},
-            request.environ
-        )
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule'],
-             'X-Cache-Operation': ['op1'],
-             'X-Cache-Foo': ['test']},
-            dict(request.response)
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
         )
 
     def test_match_body_explicitly_enable_transform_chain(self):
@@ -986,15 +1031,16 @@ class TestIntercept(unittest.TestCase):
             self.fail(str(e))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({
+            'plone.transformchain.disable': False
+        }, request.environ)
         self.assertEqual(
-            {'plone.transformchain.disable': False},
-            request.environ
-        )
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule'],
-             'X-Cache-Operation': ['op1'],
-             'X-Cache-Foo': ['test']},
-            dict(request.response)
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
         )
 
     def test_match_body_method(self):
@@ -1041,14 +1087,18 @@ class TestIntercept(unittest.TestCase):
 
         self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
         self.assertEqual(
-            {'plone.transformchain.disable': True},
-            request.environ
+            {
+                'plone.transformchain.disable': True,
+            },
+            request.environ,
         )
         self.assertEqual(
-            {'X-Cache-Rule': ['testrule'],
-             'X-Cache-Operation': ['op1'],
-             'X-Cache-Foo': ['test']},
-            dict(request.response)
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Operation': ['op1'],
+                'X-Cache-Foo': ['test'],
+            },
+            dict(request.response),
         )
 
     def test_off_switch(self):

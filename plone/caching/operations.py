@@ -27,10 +27,11 @@ class Chain(object):
 
     The option must be a sequence type (e.g. a ``Tuple``).
     """
+
     title = _(u"Chain")
     description = _(u"Allows multiple operations to be chained together")
     prefix = 'plone.caching.operations.chain'
-    options = ('operations',)
+    options = ('operations', )
 
     def __init__(self, published, request):
         self.published = published
@@ -47,7 +48,7 @@ class Chain(object):
                 operation = queryMultiAdapter(
                     (self.published, self.request),
                     ICachingOperation,
-                    name=name
+                    name=name,
                 )
 
                 if operation is not None:
@@ -56,8 +57,7 @@ class Chain(object):
                     value = operation.interceptResponse(rulename, response)
                     if value is not None:
                         response.setHeader(
-                            'X-Cache-Chain-Operations',
-                            '; '.join(chained)
+                            'X-Cache-Chain-Operations', '; '.join(chained)
                         )
                         return value
 
@@ -72,7 +72,7 @@ class Chain(object):
                 operation = queryMultiAdapter(
                     (self.published, self.request),
                     ICachingOperation,
-                    name=name
+                    name=name,
                 )
 
                 if operation is not None:

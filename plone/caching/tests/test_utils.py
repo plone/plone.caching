@@ -19,16 +19,12 @@ _marker = object()
 
 
 class TestLookupOption(unittest.TestCase):
-
     def tearDown(self):
         zope.component.testing.tearDown()
 
     def test_lookupOption_no_registry(self):
         result = lookupOption(
-            'plone.caching.tests',
-            'testrule',
-            'test',
-            default=_marker
+            'plone.caching.tests', 'testrule', 'test', default=_marker
         )
         self.assertTrue(result is _marker)
 
@@ -36,10 +32,7 @@ class TestLookupOption(unittest.TestCase):
         provideUtility(Registry(), IRegistry)
 
         result = lookupOption(
-            'plone.caching.tests',
-            'testrule',
-            'test',
-            default=_marker
+            'plone.caching.tests', 'testrule', 'test', default=_marker
         )
         self.assertTrue(result is _marker)
 
@@ -48,15 +41,11 @@ class TestLookupOption(unittest.TestCase):
         registry = getUtility(IRegistry)
 
         registry.records['plone.caching.tests.test'] = Record(
-            field.TextLine(),
-            u'default'
+            field.TextLine(), u'default'
         )
 
         result = lookupOption(
-            'plone.caching.tests',
-            'testrule',
-            'test',
-            default=_marker
+            'plone.caching.tests', 'testrule', 'test', default=_marker
         )
         self.assertEqual(u'default', result)
 
@@ -65,37 +54,30 @@ class TestLookupOption(unittest.TestCase):
         registry = getUtility(IRegistry)
 
         registry.records['plone.caching.tests.test'] = r = Record(
-            field.TextLine(),
-            u'default'
+            field.TextLine(), u'default'
         )
         registry.records['plone.caching.tests.testrule.test'] = Record(
-            FieldRef(r.__name__, r.field),
-            u'override'
+            FieldRef(r.__name__, r.field), u'override'
         )
 
         result = lookupOption(
-            'plone.caching.tests',
-            'testrule',
-            'test',
-            default=_marker
+            'plone.caching.tests', 'testrule', 'test', default=_marker
         )
         self.assertEqual(u'override', result)
 
 
 class TestLookupOptions(unittest.TestCase):
-
     def tearDown(self):
         zope.component.testing.tearDown()
 
     def test_lookupOptions_no_registry(self):
-
         @provider(ICachingOperationType)
         class DummyOperation(object):
 
             title = u''
             description = u''
             prefix = 'plone.caching.tests'
-            options = ('test1', 'test2',)
+            options = ('test1', 'test2')
 
         result = lookupOptions(DummyOperation, 'testrule', default=_marker)
         self.assertEqual({'test1': _marker, 'test2': _marker}, result)
@@ -109,7 +91,7 @@ class TestLookupOptions(unittest.TestCase):
             title = u''
             description = u''
             prefix = 'plone.caching.tests'
-            options = ('test1', 'test2',)
+            options = ('test1', 'test2')
 
         result = lookupOptions(DummyOperation, 'testrule', default=_marker)
         self.assertEqual({'test1': _marker, 'test2': _marker}, result)
@@ -119,8 +101,7 @@ class TestLookupOptions(unittest.TestCase):
         registry = getUtility(IRegistry)
 
         registry.records['plone.caching.tests.test2'] = Record(
-            field.TextLine(),
-            u'foo'
+            field.TextLine(), u'foo'
         )
 
         @provider(ICachingOperationType)
@@ -129,7 +110,7 @@ class TestLookupOptions(unittest.TestCase):
             title = u''
             description = u''
             prefix = 'plone.caching.tests'
-            options = ('test1', 'test2',)
+            options = ('test1', 'test2')
 
         result = lookupOptions(DummyOperation, 'testrule', default=_marker)
         self.assertEqual({'test1': _marker, 'test2': u'foo'}, result)
@@ -139,16 +120,13 @@ class TestLookupOptions(unittest.TestCase):
         registry = getUtility(IRegistry)
 
         registry.records['plone.caching.tests.test1'] = Record(
-            field.TextLine(),
-            u'foo'
+            field.TextLine(), u'foo'
         )
         registry.records['plone.caching.tests.test2'] = Record(
-            field.TextLine(),
-            u'bar'
+            field.TextLine(), u'bar'
         )
         registry.records['plone.caching.tests.testrule.test2'] = Record(
-            field.TextLine(),
-            u'baz'
+            field.TextLine(), u'baz'
         )
 
         @provider(ICachingOperationType)
@@ -157,7 +135,7 @@ class TestLookupOptions(unittest.TestCase):
             title = u''
             description = u''
             prefix = 'plone.caching.tests'
-            options = ('test1', 'test2',)
+            options = ('test1', 'test2')
 
         result = lookupOptions(DummyOperation, 'testrule', default=_marker)
         self.assertEqual({'test1': u'foo', 'test2': u'baz'}, result)
@@ -167,8 +145,7 @@ class TestLookupOptions(unittest.TestCase):
         registry = getUtility(IRegistry)
 
         registry.records['plone.caching.tests.test2'] = Record(
-            field.TextLine(),
-            u'foo'
+            field.TextLine(), u'foo'
         )
 
         @provider(ICachingOperationType)
@@ -177,14 +154,12 @@ class TestLookupOptions(unittest.TestCase):
             title = u''
             description = u''
             prefix = 'plone.caching.tests'
-            options = ('test1', 'test2',)
+            options = ('test1', 'test2')
 
         provideUtility(DummyOperation, name=u'plone.caching.tests')
 
         result = lookupOptions(
-            u'plone.caching.tests',
-            'testrule',
-            default=_marker
+            u'plone.caching.tests', 'testrule', default=_marker
         )
         self.assertEqual({'test1': _marker, 'test2': u'foo'}, result)
 

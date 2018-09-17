@@ -31,6 +31,7 @@ class DummyView(object):
 
 
 class DummyResource(object):
+
     def index_html(self):
         return b'binary data'
 
@@ -55,6 +56,7 @@ class DummyResponse(dict):
 
 
 class DummyRequest(dict):
+
     def __init__(self, published, response):
         self['PUBLISHED'] = published
         self.response = response
@@ -62,11 +64,13 @@ class DummyRequest(dict):
 
 
 class DummyEvent(object):
+
     def __init__(self, request):
         self.request = request
 
 
 class DummyStreamingEvent(object):
+
     def __init__(self, response):
         self.response = response
 
@@ -185,7 +189,9 @@ class TestMutateResponse(unittest.TestCase):
         MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule']}, dict(request.response))
+        self.assertEqual({
+            'X-Cache-Rule': ['testrule']
+        }, dict(request.response))
 
     def test_operation_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -204,7 +210,9 @@ class TestMutateResponse(unittest.TestCase):
         MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule']}, dict(request.response))
+        self.assertEqual({
+            'X-Cache-Rule': ['testrule']
+        }, dict(request.response))
 
     def test_match_unicode(self):
         provideAdapter(DefaultRulesetLookup)
@@ -220,6 +228,7 @@ class TestMutateResponse(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -261,6 +270,7 @@ class TestMutateResponse(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -302,6 +312,7 @@ class TestMutateResponse(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -343,6 +354,7 @@ class TestMutateResponse(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -384,6 +396,7 @@ class TestMutateResponse(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -538,7 +551,9 @@ class TestMutateResponseStreaming(unittest.TestCase):
         modifyStreamingResponse(DummyStreamingEvent(response))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule']}, dict(request.response))
+        self.assertEqual({
+            'X-Cache-Rule': ['testrule']
+        }, dict(request.response))
 
     def test_operation_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -559,7 +574,9 @@ class TestMutateResponseStreaming(unittest.TestCase):
         modifyStreamingResponse(DummyStreamingEvent(response))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule']}, dict(request.response))
+        self.assertEqual({
+            'X-Cache-Rule': ['testrule']
+        }, dict(request.response))
 
     def test_match_unicode(self):
         provideAdapter(DefaultRulesetLookup)
@@ -575,6 +592,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -618,6 +636,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -661,6 +680,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -704,6 +724,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -747,6 +768,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -865,7 +887,9 @@ class TestIntercept(unittest.TestCase):
         intercept(DummyEvent(request))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule']}, dict(request.response))
+        self.assertEqual({
+            'X-Cache-Rule': ['testrule']
+        }, dict(request.response))
 
     def test_match_abort(self):
         provideAdapter(DefaultRulesetLookup)
@@ -881,6 +905,7 @@ class TestIntercept(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -900,7 +925,10 @@ class TestIntercept(unittest.TestCase):
         intercept(DummyEvent(request))
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual(
-            {'X-Cache-Rule': ['testrule'], 'X-Cache-Foo': ['test']},
+            {
+                'X-Cache-Rule': ['testrule'],
+                'X-Cache-Foo': ['test']
+            },
             dict(request.response),
         )
 
@@ -918,6 +946,7 @@ class TestIntercept(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -946,9 +975,9 @@ class TestIntercept(unittest.TestCase):
             self.fail(str(e))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'plone.transformchain.disable': True}, request.environ
-        )
+        self.assertEqual({
+            'plone.transformchain.disable': True
+        }, request.environ)
         self.assertEqual(
             {
                 'X-Cache-Rule': ['testrule'],
@@ -972,6 +1001,7 @@ class TestIntercept(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1001,9 +1031,9 @@ class TestIntercept(unittest.TestCase):
             self.fail(str(e))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'plone.transformchain.disable': False}, request.environ
-        )
+        self.assertEqual({
+            'plone.transformchain.disable': False
+        }, request.environ)
         self.assertEqual(
             {
                 'X-Cache-Rule': ['testrule'],
@@ -1027,6 +1057,7 @@ class TestIntercept(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1056,7 +1087,10 @@ class TestIntercept(unittest.TestCase):
 
         self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
         self.assertEqual(
-            {'plone.transformchain.disable': True}, request.environ
+            {
+                'plone.transformchain.disable': True,
+            },
+            request.environ,
         )
         self.assertEqual(
             {
@@ -1081,6 +1115,7 @@ class TestIntercept(unittest.TestCase):
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1101,9 +1136,11 @@ class TestIntercept(unittest.TestCase):
         self.assertEqual({}, dict(request.response))
 
     def test_dont_swallow_conflict_error(self):
+
         @implementer(IRulesetLookup)
         @adapter(Interface, Interface)
         class DummyRulesetLookup(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1125,9 +1162,11 @@ class TestIntercept(unittest.TestCase):
         self.assertRaises(ConflictError, intercept, DummyEvent(request))
 
     def test_swallow_other_error(self):
+
         @implementer(IRulesetLookup)
         @adapter(Interface, Interface)
         class DummyRulesetLookup(object):
+
             def __init__(self, published, request):
                 self.published = published
                 self.request = request

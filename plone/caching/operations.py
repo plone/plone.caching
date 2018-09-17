@@ -31,7 +31,7 @@ class Chain(object):
     title = _(u"Chain")
     description = _(u"Allows multiple operations to be chained together")
     prefix = 'plone.caching.operations.chain'
-    options = ('operations',)
+    options = ('operations', )
 
     def __init__(self, published, request):
         self.published = published
@@ -46,7 +46,9 @@ class Chain(object):
             for name in options['operations']:
 
                 operation = queryMultiAdapter(
-                    (self.published, self.request), ICachingOperation, name=name
+                    (self.published, self.request),
+                    ICachingOperation,
+                    name=name,
                 )
 
                 if operation is not None:
@@ -68,7 +70,9 @@ class Chain(object):
             for name in options['operations']:
 
                 operation = queryMultiAdapter(
-                    (self.published, self.request), ICachingOperation, name=name
+                    (self.published, self.request),
+                    ICachingOperation,
+                    name=name,
                 )
 
                 if operation is not None:

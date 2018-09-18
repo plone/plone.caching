@@ -10,11 +10,13 @@ Breaking changes:
 
 New features:
 
-- *add item here*
+- Add support for Python 3.
+  [pbauer]
 
 Bug fixes:
 
-- Fix caching and tests in python 3 [ale-rt, pbauer]
+- Fix caching and tests in python 3
+  [ale-rt, pbauer]
 
 
 1.1.2 (2016-09-16)

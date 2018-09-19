@@ -85,7 +85,7 @@ def findOperation(request):
 
     # If we get a method, try to look up its class
     if isinstance(published, types.MethodType):
-        published = getattr(published, 'im_self', published)
+        published = getattr(published, '__self__', published)
 
     registry = queryUtility(IRegistry)
     if registry is None:

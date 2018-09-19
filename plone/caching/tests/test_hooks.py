@@ -32,7 +32,7 @@ class DummyView(object):
 
 class DummyResource(object):
     def index_html(self):
-        return 'binary data'
+        return b'binary data'
 
 
 class DummyResponse(dict):
@@ -922,12 +922,12 @@ class TestIntercept(unittest.TestCase):
         try:
             intercept(DummyEvent(request))
             self.fail()
-        except Intercepted, e:
+        except Intercepted as e:
             self.assertEqual(u'dummy', e.responseBody)
             self.assertEqual(304, e.status)
             self.assertEqual(304, request.response.status)
             self.assertEqual(True, request.response.locked)
-        except Exception, e:
+        except Exception as e:
             self.fail(str(e))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
@@ -977,12 +977,12 @@ class TestIntercept(unittest.TestCase):
         try:
             intercept(DummyEvent(request))
             self.fail()
-        except Intercepted, e:
+        except Intercepted as e:
             self.assertEqual(u'dummy', e.responseBody)
             self.assertEqual(304, e.status)
             self.assertEqual(304, request.response.status)
             self.assertEqual(True, request.response.locked)
-        except Exception, e:
+        except Exception as e:
             self.fail(str(e))
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
@@ -1031,12 +1031,12 @@ class TestIntercept(unittest.TestCase):
         try:
             intercept(DummyEvent(request))
             self.fail()
-        except Intercepted, e:
+        except Intercepted as e:
             self.assertEqual(u'dummy', e.responseBody)
             self.assertEqual(200, e.status)
             self.assertEqual(200, request.response.status)
             self.assertEqual(True, request.response.locked)
-        except Exception, e:
+        except Exception as e:
             self.fail(str(e))
 
         self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))

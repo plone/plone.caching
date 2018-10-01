@@ -19,7 +19,7 @@ setup(name='plone.caching',
       description="Zope 2 integration for z3c.caching",
       long_description=long_description,
       # Get more strings from
-      # https://pypi.python.org/pypi?%3Aaction=list_classifiers
+      # https://pypi.org/classifiers/
       classifiers=[
           "Framework :: Plone",
           "Framework :: Plone :: 5.0",
@@ -35,7 +35,7 @@ setup(name='plone.caching',
       keywords='plone http caching',
       author='Plone Foundation',
       author_email='plone-developers@lists.sourceforge.net',
-      url='https://pypi.python.org/pypi/plone.caching',
+      url='https://pypi.org/project/plone.caching',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['plone'],

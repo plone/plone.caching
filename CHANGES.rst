@@ -14,8 +14,8 @@ New features:
 
 Bug fixes:
 
-- *add item here*
-
+- Remove five.globalrequest usage.
+  [gforcada]
 
 1.2.0 (2018-09-28)
 ------------------

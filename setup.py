@@ -50,7 +50,6 @@ setup(name='plone.caching',
           'zope.i18nmessageid',
           'zope.schema',
           'plone.transformchain',
-          'five.globalrequest',
           'Zope2 >= 2.12.4',
       ],
       entry_points="""

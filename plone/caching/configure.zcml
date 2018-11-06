@@ -4,8 +4,6 @@
     xmlns:browser="http://namespaces.zope.org/browser"
     i18n_domain="plone">
 
-    <include package="five.globalrequest" />
-
     <include package="z3c.caching" file="meta.zcml" />
     <include package="z3c.caching" />
 

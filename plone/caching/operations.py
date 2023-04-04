@@ -26,10 +26,11 @@ class Chain:
 
     The option must be a sequence type (e.g. a ``Tuple``).
     """
+
     title = _("Chain")
     description = _("Allows multiple operations to be chained together")
-    prefix = 'plone.caching.operations.chain'
-    options = ('operations',)
+    prefix = "plone.caching.operations.chain"
+    options = ("operations",)
 
     def __init__(self, published, request):
         self.published = published
@@ -40,13 +41,10 @@ class Chain:
 
         chained = []
 
-        if options['operations']:
-            for name in options['operations']:
-
+        if options["operations"]:
+            for name in options["operations"]:
                 operation = queryMultiAdapter(
-                    (self.published, self.request),
-                    ICachingOperation,
-                    name=name
+                    (self.published, self.request), ICachingOperation, name=name
                 )
 
                 if operation is not None:
@@ -55,8 +53,7 @@ class Chain:
                     value = operation.interceptResponse(rulename, response)
                     if value is not None:
                         response.setHeader(
-                            'X-Cache-Chain-Operations',
-                            '; '.join(chained)
+                            "X-Cache-Chain-Operations", "; ".join(chained)
                         )
                         return value
 
@@ -65,13 +62,10 @@ class Chain:
 
         chained = []
 
-        if options['operations']:
-            for name in options['operations']:
-
+        if options["operations"]:
+            for name in options["operations"]:
                 operation = queryMultiAdapter(
-                    (self.published, self.request),
-                    ICachingOperation,
-                    name=name
+                    (self.published, self.request), ICachingOperation, name=name
                 )
 
                 if operation is not None:
@@ -79,4 +73,4 @@ class Chain:
                     operation.modifyResponse(rulename, response)
 
         if chained:
-            response.setHeader('X-Cache-Chain-Operations', '; '.join(chained))
+            response.setHeader("X-Cache-Chain-Operations", "; ".join(chained))

@@ -31,11 +31,10 @@ class DummyView:
 
 class DummyResource:
     def index_html(self):
-        return b'binary data'
+        return b"binary data"
 
 
 class DummyResponse(dict):
-
     locked = None
 
     def addHeader(self, name, value):
@@ -55,7 +54,7 @@ class DummyResponse(dict):
 
 class DummyRequest(dict):
     def __init__(self, published, response):
-        self['PUBLISHED'] = published
+        self["PUBLISHED"] = published
         self.response = response
         self.environ = {}
 
@@ -71,7 +70,6 @@ class DummyStreamingEvent:
 
 
 class TestMutateResponse(unittest.TestCase):
-
     layer = IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
 
     def setUp(self):
@@ -87,9 +85,9 @@ class TestMutateResponse(unittest.TestCase):
 
         request = DummyRequest(None, DummyResponse())
 
-        MutatorTransform(None, request).transformUnicode('', 'utf-8')
+        MutatorTransform(None, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': None}, dict(request))
+        self.assertEqual({"PUBLISHED": None}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_registry(self):
@@ -97,9 +95,9 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode('', 'utf-8')
+        MutatorTransform(view, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_records(self):
@@ -108,9 +106,9 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode('', 'utf-8')
+        MutatorTransform(view, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_mapping(self):
@@ -121,14 +119,14 @@ class TestMutateResponse(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
+        z3c.caching.registry.register(DummyView, "testrule")
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode('', 'utf-8')
+        MutatorTransform(view, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_cache_rule(self):
@@ -139,14 +137,14 @@ class TestMutateResponse(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        settings.operationMapping = {'testrule': 'dummy'}
+        settings.operationMapping = {"testrule": "dummy"}
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode('', 'utf-8')
+        MutatorTransform(view, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_lookup_adapter(self):
@@ -156,15 +154,15 @@ class TestMutateResponse(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'dummy'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "dummy"}
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode('', 'utf-8')
+        MutatorTransform(view, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_operation_name_not_found(self):
@@ -175,19 +173,16 @@ class TestMutateResponse(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'foo': 'bar'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"foo": "bar"}
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode('', 'utf-8')
+        MutatorTransform(view, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule']},
-            dict(request.response)
-        )
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual({"X-Cache-Rule": ["testrule"]}, dict(request.response))
 
     def test_operation_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -197,19 +192,16 @@ class TestMutateResponse(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'notfound'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "notfound"}
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode('', 'utf-8')
+        MutatorTransform(view, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule']},
-            dict(request.response)
-        )
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual({"X-Cache-Rule": ["testrule"]}, dict(request.response))
 
     def test_match_unicode(self):
         provideAdapter(DefaultRulesetLookup)
@@ -219,13 +211,12 @@ class TestMutateResponse(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -234,19 +225,24 @@ class TestMutateResponse(unittest.TestCase):
                 return None
 
             def modifyResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode('', 'utf-8')
+        MutatorTransform(view, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual(
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
+        )
 
     def test_match_bytes(self):
         provideAdapter(DefaultRulesetLookup)
@@ -256,13 +252,12 @@ class TestMutateResponse(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -271,19 +266,24 @@ class TestMutateResponse(unittest.TestCase):
                 return None
 
             def modifyResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformBytes('', 'utf-8')
+        MutatorTransform(view, request).transformBytes("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual(
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
+        )
 
     def test_match_iterable(self):
         provideAdapter(DefaultRulesetLookup)
@@ -293,13 +293,12 @@ class TestMutateResponse(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -308,19 +307,24 @@ class TestMutateResponse(unittest.TestCase):
                 return None
 
             def modifyResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformIterable([''], 'utf-8')
+        MutatorTransform(view, request).transformIterable([""], "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual(
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
+        )
 
     def test_match_method(self):
         provideAdapter(DefaultRulesetLookup)
@@ -330,13 +334,12 @@ class TestMutateResponse(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyResource, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyResource, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -345,19 +348,24 @@ class TestMutateResponse(unittest.TestCase):
                 return None
 
             def modifyResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         resource = DummyResource()
         request = DummyRequest(resource.index_html, DummyResponse())
 
-        MutatorTransform(resource, request).transformUnicode('', 'utf-8')
+        MutatorTransform(resource, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({"PUBLISHED": resource.index_html}, dict(request))
+        self.assertEqual(
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
+        )
 
     def test_off_switch(self):
         provideAdapter(DefaultRulesetLookup)
@@ -367,13 +375,12 @@ class TestMutateResponse(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = False
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -382,21 +389,20 @@ class TestMutateResponse(unittest.TestCase):
                 return None
 
             def modifyResponse(self, rulename, response):
-                response['X-Mutated'] = rulename
+                response["X-Mutated"] = rulename
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode('', 'utf-8')
+        MutatorTransform(view, request).transformUnicode("", "utf-8")
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
 
 class TestMutateResponseStreaming(unittest.TestCase):
-
     layer = IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
 
     def setUp(self):
@@ -419,7 +425,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': None}, dict(request))
+        self.assertEqual({"PUBLISHED": None}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_registry(self):
@@ -432,7 +438,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_records(self):
@@ -446,7 +452,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_mapping(self):
@@ -457,7 +463,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
+        z3c.caching.registry.register(DummyView, "testrule")
 
         view = DummyView()
         response = DummyResponse()
@@ -466,7 +472,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_cache_rule(self):
@@ -477,7 +483,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        settings.operationMapping = {'testrule': 'dummy'}
+        settings.operationMapping = {"testrule": "dummy"}
 
         view = DummyView()
         response = DummyResponse()
@@ -486,7 +492,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_lookup_adapter(self):
@@ -496,8 +502,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'dummy'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "dummy"}
 
         view = DummyView()
         response = DummyResponse()
@@ -506,7 +512,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_operation_name_not_found(self):
@@ -517,8 +523,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'foo': 'bar'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"foo": "bar"}
 
         view = DummyView()
         response = DummyResponse()
@@ -527,11 +533,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule']},
-            dict(request.response)
-        )
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual({"X-Cache-Rule": ["testrule"]}, dict(request.response))
 
     def test_operation_not_found(self):
         provideAdapter(DefaultRulesetLookup)
@@ -541,8 +544,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'notfound'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "notfound"}
 
         view = DummyView()
         response = DummyResponse()
@@ -551,11 +554,8 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule']},
-            dict(request.response)
-        )
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual({"X-Cache-Rule": ["testrule"]}, dict(request.response))
 
     def test_match_unicode(self):
         provideAdapter(DefaultRulesetLookup)
@@ -565,13 +565,12 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -580,9 +579,9 @@ class TestMutateResponseStreaming(unittest.TestCase):
                 return None
 
             def modifyResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         response = DummyResponse()
@@ -591,10 +590,15 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual(
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
+        )
 
     def test_match_bytes(self):
         provideAdapter(DefaultRulesetLookup)
@@ -604,13 +608,12 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -619,9 +622,9 @@ class TestMutateResponseStreaming(unittest.TestCase):
                 return None
 
             def modifyResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         response = DummyResponse()
@@ -630,10 +633,15 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual(
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
+        )
 
     def test_match_iterable(self):
         provideAdapter(DefaultRulesetLookup)
@@ -643,13 +651,12 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -658,9 +665,9 @@ class TestMutateResponseStreaming(unittest.TestCase):
                 return None
 
             def modifyResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         response = DummyResponse()
@@ -669,10 +676,15 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual(
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
+        )
 
     def test_match_method(self):
         provideAdapter(DefaultRulesetLookup)
@@ -682,13 +694,12 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyResource, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyResource, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -697,9 +708,9 @@ class TestMutateResponseStreaming(unittest.TestCase):
                 return None
 
             def modifyResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         resource = DummyResource()
         response = DummyResponse()
@@ -708,10 +719,15 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Operation': ['op1'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({"PUBLISHED": resource.index_html}, dict(request))
+        self.assertEqual(
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
+        )
 
     def test_off_switch(self):
         provideAdapter(DefaultRulesetLookup)
@@ -721,13 +737,12 @@ class TestMutateResponseStreaming(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = False
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -736,9 +751,9 @@ class TestMutateResponseStreaming(unittest.TestCase):
                 return None
 
             def modifyResponse(self, rulename, response):
-                response['X-Mutated'] = rulename
+                response["X-Mutated"] = rulename
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         response = DummyResponse()
@@ -747,12 +762,11 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         modifyStreamingResponse(DummyStreamingEvent(response))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
 
 class TestIntercept(unittest.TestCase):
-
     layer = IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
 
     def setUp(self):
@@ -769,7 +783,7 @@ class TestIntercept(unittest.TestCase):
         request = DummyRequest(None, DummyResponse())
 
         intercept(DummyEvent(request))
-        self.assertEqual({'PUBLISHED': None}, dict(request))
+        self.assertEqual({"PUBLISHED": None}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_registry(self):
@@ -779,7 +793,7 @@ class TestIntercept(unittest.TestCase):
 
         intercept(DummyEvent(request))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_records(self):
@@ -791,7 +805,7 @@ class TestIntercept(unittest.TestCase):
 
         intercept(DummyEvent(request))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_cache_rule(self):
@@ -802,13 +816,13 @@ class TestIntercept(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        settings.operationMapping = {'testrule': 'dummy'}
+        settings.operationMapping = {"testrule": "dummy"}
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         intercept(DummyEvent(request))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_no_mapping(self):
@@ -821,13 +835,13 @@ class TestIntercept(unittest.TestCase):
 
         settings.operationMapping = None
 
-        z3c.caching.registry.register(DummyView, 'testrule')
+        z3c.caching.registry.register(DummyView, "testrule")
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         intercept(DummyEvent(request))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_operation_not_found(self):
@@ -838,18 +852,15 @@ class TestIntercept(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'notfound'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "notfound"}
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         intercept(DummyEvent(request))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule']},
-            dict(request.response)
-        )
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual({"X-Cache-Rule": ["testrule"]}, dict(request.response))
 
     def test_match_abort(self):
         provideAdapter(DefaultRulesetLookup)
@@ -859,13 +870,12 @@ class TestIntercept(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -874,18 +884,20 @@ class TestIntercept(unittest.TestCase):
                 pass
 
             def interceptResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
                 return None
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
         intercept(DummyEvent(request))
-        self.assertEqual({'PUBLISHED': view}, dict(request))
-        self.assertEqual({'X-Cache-Rule': ['testrule'],
-                          'X-Cache-Foo': ['test']}, dict(request.response))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual(
+            {"X-Cache-Rule": ["testrule"], "X-Cache-Foo": ["test"]},
+            dict(request.response),
+        )
 
     def test_match_body(self):
         provideAdapter(DefaultRulesetLookup)
@@ -895,13 +907,12 @@ class TestIntercept(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -910,11 +921,11 @@ class TestIntercept(unittest.TestCase):
                 pass
 
             def interceptResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
                 response.setStatus(304)
-                return 'dummy'
+                return "dummy"
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -922,23 +933,22 @@ class TestIntercept(unittest.TestCase):
             intercept(DummyEvent(request))
             self.fail()
         except Intercepted as e:
-            self.assertEqual('dummy', e.responseBody)
+            self.assertEqual("dummy", e.responseBody)
             self.assertEqual(304, e.status)
             self.assertEqual(304, request.response.status)
             self.assertEqual(True, request.response.locked)
         except Exception as e:
             self.fail(str(e))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual({"plone.transformchain.disable": True}, request.environ)
         self.assertEqual(
-            {'plone.transformchain.disable': True},
-            request.environ
-        )
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule'],
-             'X-Cache-Operation': ['op1'],
-             'X-Cache-Foo': ['test']},
-            dict(request.response)
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
         )
 
     def test_match_body_explicitly_enable_transform_chain(self):
@@ -949,13 +959,12 @@ class TestIntercept(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -964,12 +973,12 @@ class TestIntercept(unittest.TestCase):
                 pass
 
             def interceptResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
                 response.setStatus(304)
-                self.request.environ['plone.transformchain.disable'] = False
-                return 'dummy'
+                self.request.environ["plone.transformchain.disable"] = False
+                return "dummy"
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -977,23 +986,22 @@ class TestIntercept(unittest.TestCase):
             intercept(DummyEvent(request))
             self.fail()
         except Intercepted as e:
-            self.assertEqual('dummy', e.responseBody)
+            self.assertEqual("dummy", e.responseBody)
             self.assertEqual(304, e.status)
             self.assertEqual(304, request.response.status)
             self.assertEqual(True, request.response.locked)
         except Exception as e:
             self.fail(str(e))
 
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
+        self.assertEqual({"plone.transformchain.disable": False}, request.environ)
         self.assertEqual(
-            {'plone.transformchain.disable': False},
-            request.environ
-        )
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule'],
-             'X-Cache-Operation': ['op1'],
-             'X-Cache-Foo': ['test']},
-            dict(request.response)
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
         )
 
     def test_match_body_method(self):
@@ -1004,13 +1012,12 @@ class TestIntercept(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
 
-        z3c.caching.registry.register(DummyResource, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyResource, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1019,11 +1026,11 @@ class TestIntercept(unittest.TestCase):
                 pass
 
             def interceptResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
+                response.addHeader("X-Cache-Foo", "test")
                 response.setStatus(200)
-                return 'dummy'
+                return "dummy"
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         resource = DummyResource()
         request = DummyRequest(resource.index_html, DummyResponse())
@@ -1031,23 +1038,22 @@ class TestIntercept(unittest.TestCase):
             intercept(DummyEvent(request))
             self.fail()
         except Intercepted as e:
-            self.assertEqual('dummy', e.responseBody)
+            self.assertEqual("dummy", e.responseBody)
             self.assertEqual(200, e.status)
             self.assertEqual(200, request.response.status)
             self.assertEqual(True, request.response.locked)
         except Exception as e:
             self.fail(str(e))
 
-        self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
+        self.assertEqual({"PUBLISHED": resource.index_html}, dict(request))
+        self.assertEqual({"plone.transformchain.disable": True}, request.environ)
         self.assertEqual(
-            {'plone.transformchain.disable': True},
-            request.environ
-        )
-        self.assertEqual(
-            {'X-Cache-Rule': ['testrule'],
-             'X-Cache-Operation': ['op1'],
-             'X-Cache-Foo': ['test']},
-            dict(request.response)
+            {
+                "X-Cache-Rule": ["testrule"],
+                "X-Cache-Operation": ["op1"],
+                "X-Cache-Foo": ["test"],
+            },
+            dict(request.response),
         )
 
     def test_off_switch(self):
@@ -1058,13 +1064,12 @@ class TestIntercept(unittest.TestCase):
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = False
 
-        z3c.caching.registry.register(DummyView, 'testrule')
-        settings.operationMapping = {'testrule': 'op1'}
+        z3c.caching.registry.register(DummyView, "testrule")
+        settings.operationMapping = {"testrule": "op1"}
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
         class DummyOperation:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1073,23 +1078,21 @@ class TestIntercept(unittest.TestCase):
                 pass
 
             def interceptResponse(self, rulename, response):
-                response.addHeader('X-Cache-Foo', 'test')
-                return 'dummy'
+                response.addHeader("X-Cache-Foo", "test")
+                return "dummy"
 
-        provideAdapter(DummyOperation, name='op1')
+        provideAdapter(DummyOperation, name="op1")
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         intercept(DummyEvent(request))
-        self.assertEqual({'PUBLISHED': view}, dict(request))
+        self.assertEqual({"PUBLISHED": view}, dict(request))
         self.assertEqual({}, dict(request.response))
 
     def test_dont_swallow_conflict_error(self):
-
         @implementer(IRulesetLookup)
         @adapter(Interface, Interface)
         class DummyRulesetLookup:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
@@ -1104,24 +1107,22 @@ class TestIntercept(unittest.TestCase):
         registry.registerInterface(ICacheSettings)
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
-        settings.operationMapping = {'foo': 'bar'}
+        settings.operationMapping = {"foo": "bar"}
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
         self.assertRaises(ConflictError, intercept, DummyEvent(request))
 
     def test_swallow_other_error(self):
-
         @implementer(IRulesetLookup)
         @adapter(Interface, Interface)
         class DummyRulesetLookup:
-
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def __call__(self):
-                raise AttributeError('Should be swallowed and logged')
+                raise AttributeError("Should be swallowed and logged")
 
         provideAdapter(DummyRulesetLookup)
 
@@ -1130,7 +1131,7 @@ class TestIntercept(unittest.TestCase):
         registry.registerInterface(ICacheSettings)
         settings = registry.forInterface(ICacheSettings)
         settings.enabled = True
-        settings.operationMapping = {'foo': 'bar'}
+        settings.operationMapping = {"foo": "bar"}
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -1138,14 +1139,14 @@ class TestIntercept(unittest.TestCase):
         try:
             intercept(DummyEvent(request))
         except Exception:
-            self.fail('Intercept should not raise')
+            self.fail("Intercept should not raise")
 
     def test_exception_view(self):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        exc = Intercepted(status=200, responseBody='Test')
+        exc = Intercepted(status=200, responseBody="Test")
         excView = InterceptorResponse(exc, request)
-        self.assertEqual('Test', excView())
+        self.assertEqual("Test", excView())
 
 
 def test_suite():

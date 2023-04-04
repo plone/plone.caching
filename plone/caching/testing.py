@@ -19,7 +19,7 @@ class ImplicitRulesetRegistryUnitTestingLayer(Layer):
     startup hook.
     """
 
-    defaultBases = (UNIT_TESTING, )
+    defaultBases = (UNIT_TESTING,)
 
     def testSetUp(self):
         provideAdapter(RulesetRegistry)
@@ -40,5 +40,4 @@ class ImplicitRulesetRegistryUnitTestingLayer(Layer):
             registry.explicit = self._explicit_mode_cache
 
 
-IMPLICIT_RULESET_REGISTRY_UNIT_TESTING = (
-    ImplicitRulesetRegistryUnitTestingLayer())
+IMPLICIT_RULESET_REGISTRY_UNIT_TESTING = ImplicitRulesetRegistryUnitTestingLayer()

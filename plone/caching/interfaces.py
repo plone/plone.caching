@@ -126,7 +126,7 @@ class ICachingOperationType(Interface):
 
     description = schema.Text(
         title=_("Description"),
-        description=_("A longer description for the operaton"),
+        description=_("A longer description for the operation"),
         required=False,
     )
 

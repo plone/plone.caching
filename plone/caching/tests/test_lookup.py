@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.caching.lookup import DefaultRulesetLookup
 from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
 
@@ -6,7 +5,7 @@ import unittest
 import z3c.caching.registry
 
 
-class DummyView(object):
+class DummyView:
     pass
 
 

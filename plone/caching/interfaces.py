@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from zope import schema
 from zope.interface import Interface
 
@@ -16,16 +15,16 @@ class ICacheSettings(Interface):
     """
 
     enabled = schema.Bool(
-        title=_(u'Globally enabled'),
-        description=_(u'If not set, no caching operations will be attempted'),
+        title=_('Globally enabled'),
+        description=_('If not set, no caching operations will be attempted'),
         default=False,
     )
 
     operationMapping = schema.Dict(
-        title=_(u'Rule set/operation mapping'),
-        description=_(u'Maps rule set names to operation names'),
-        key_type=schema.DottedName(title=_(u'Rule set name')),
-        value_type=schema.DottedName(title=_(u'Caching operation name')),
+        title=_('Rule set/operation mapping'),
+        description=_('Maps rule set names to operation names'),
+        key_type=schema.DottedName(title=_('Rule set name')),
+        value_type=schema.DottedName(title=_('Caching operation name')),
     )
 
 #
@@ -120,33 +119,33 @@ class ICachingOperationType(Interface):
     """
 
     title = schema.TextLine(
-        title=_(u'Title'),
-        description=_(u'A descriptive title for the operation'),
+        title=_('Title'),
+        description=_('A descriptive title for the operation'),
     )
 
     description = schema.Text(
-        title=_(u'Description'),
-        description=_(u'A longer description for the operaton'),
+        title=_('Description'),
+        description=_('A longer description for the operaton'),
         required=False,
     )
 
     prefix = schema.DottedName(
-        title=_(u'Registry prefix'),
-        description=_(u'Prefix for records in the registry pertaining to '
-                      u'this operation. This, alongside the next '
-                      u'parameter, allows the user interface to present '
-                      u'relevant configuration options for this '
-                      u'operation.'),
+        title=_('Registry prefix'),
+        description=_('Prefix for records in the registry pertaining to '
+                      'this operation. This, alongside the next '
+                      'parameter, allows the user interface to present '
+                      'relevant configuration options for this '
+                      'operation.'),
         required=False,
     )
 
     options = schema.Tuple(
-        title=_(u'Registry options'),
-        description=_(u'A tuple of options which can be used to '
-                      u'configure this operation. An option is looked '
-                      u'up in the registry by concatenating the prefix '
-                      u'with the option name, optionally preceded by '
-                      u'the rule set name, to allow per-rule overrides.'),
+        title=_('Registry options'),
+        description=_('A tuple of options which can be used to '
+                      'configure this operation. An option is looked '
+                      'up in the registry by concatenating the prefix '
+                      'with the option name, optionally preceded by '
+                      'the rule set name, to allow per-rule overrides.'),
         value_type=schema.DottedName(),
         required=False,
     )

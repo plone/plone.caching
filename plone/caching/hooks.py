@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.caching.interfaces import X_CACHE_OPERATION_HEADER
 from plone.caching.interfaces import X_CACHE_RULE_HEADER
 from plone.caching.utils import findOperation
@@ -36,12 +35,12 @@ class Intercepted(Exception):
     responseBody = None
     status = None
 
-    def __init__(self, status=304, responseBody=u""):
+    def __init__(self, status=304, responseBody=""):
         self.status = status
         self.responseBody = responseBody
 
 
-class InterceptorResponse(object):
+class InterceptorResponse:
     """View for the Intercepted exception, serving to return an empty
     response in the case of an intercepted response.
     """
@@ -118,7 +117,7 @@ def intercept(event):
 
 @implementer(ITransform)
 @adapter(Interface, Interface)
-class MutatorTransform(object):
+class MutatorTransform:
     """Transformation using plone.transformchain.
 
     This is registered at order 12000, i.e. "late". A typical transform

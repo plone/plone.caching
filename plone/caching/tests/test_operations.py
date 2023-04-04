@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.caching.interfaces import ICachingOperation
 from plone.caching.operations import Chain
 from plone.caching.testing import IMPLICIT_RULESET_REGISTRY_UNIT_TESTING
@@ -18,7 +17,7 @@ import unittest
 _marker = object()
 
 
-class DummyView(object):
+class DummyView:
     pass
 
 
@@ -60,7 +59,7 @@ class TestChain(unittest.TestCase):
     def test_operations_list_not_set(self):
 
         self.registry.records[
-            '{0}.operations'.format(Chain.prefix)
+            f'{Chain.prefix}.operations'
         ] = Record(field.List(value_type=field.Text()))
 
         view = DummyView()
@@ -77,7 +76,7 @@ class TestChain(unittest.TestCase):
     def test_operations_empty(self):
 
         self.registry.records[
-            '{0}.operations'.format(Chain.prefix)
+            f'{Chain.prefix}.operations'
         ] = Record(field.List(value_type=field.Text()), [])
 
         view = DummyView()
@@ -94,8 +93,8 @@ class TestChain(unittest.TestCase):
     def test_chained_operations_not_found(self):
 
         self.registry.records[
-            '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(value_type=field.Text()), [u'op1'])
+            f'{Chain.prefix}.operations'
+        ] = Record(field.List(value_type=field.Text()), ['op1'])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
@@ -108,22 +107,22 @@ class TestChain(unittest.TestCase):
 
     def test_multiple_operations_one_found(self):
         self.registry.records[
-            '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(value_type=field.Text()), [u'op1', u'op2'])
+            f'{Chain.prefix}.operations'
+        ] = Record(field.List(value_type=field.Text()), ['op1', 'op2'])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def interceptResponse(self, rulename, response):
-                return u'foo'
+                return 'foo'
 
             def modifyResponse(self, rulename, response):
                 response['X-Mutated'] = rulename
@@ -133,7 +132,7 @@ class TestChain(unittest.TestCase):
         chain = Chain(view, request)
         ret = chain.interceptResponse('testrule', request.response)
 
-        self.assertEqual(u'foo', ret)
+        self.assertEqual('foo', ret)
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual(
             {'X-Cache-Chain-Operations': 'op2'},
@@ -153,22 +152,22 @@ class TestChain(unittest.TestCase):
 
     def test_multiple_operations_multiple_found(self):
         self.registry.records[
-            '{0}.operations'.format(Chain.prefix)
-        ] = Record(field.List(value_type=field.Text()), [u'op1', u'op2'])
+            f'{Chain.prefix}.operations'
+        ] = Record(field.List(value_type=field.Text()), ['op1', 'op2'])
 
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation1(object):
+        class DummyOperation1:
 
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def interceptResponse(self, rulename, response):
-                return u'foo'
+                return 'foo'
 
             def modifyResponse(self, rulename, response):
                 response['X-Mutated-1'] = rulename
@@ -177,14 +176,14 @@ class TestChain(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation2(object):
+        class DummyOperation2:
 
             def __init__(self, published, request):
                 self.published = published
                 self.request = request
 
             def interceptResponse(self, rulename, response):
-                return u'bar'
+                return 'bar'
 
             def modifyResponse(self, rulename, response):
                 response['X-Mutated-2'] = rulename
@@ -194,7 +193,7 @@ class TestChain(unittest.TestCase):
         chain = Chain(view, request)
         ret = chain.interceptResponse('testrule', request.response)
 
-        self.assertEqual(u'foo', ret)
+        self.assertEqual('foo', ret)
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual(
             {'X-Cache-Chain-Operations': 'op1'},

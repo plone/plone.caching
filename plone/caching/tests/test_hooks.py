@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.caching.hooks import intercept
 from plone.caching.hooks import Intercepted
 from plone.caching.hooks import InterceptorResponse
@@ -26,11 +25,11 @@ import unittest
 import z3c.caching.registry
 
 
-class DummyView(object):
+class DummyView:
     pass
 
 
-class DummyResource(object):
+class DummyResource:
     def index_html(self):
         return b'binary data'
 
@@ -61,12 +60,12 @@ class DummyRequest(dict):
         self.environ = {}
 
 
-class DummyEvent(object):
+class DummyEvent:
     def __init__(self, request):
         self.request = request
 
 
-class DummyStreamingEvent(object):
+class DummyStreamingEvent:
     def __init__(self, response):
         self.response = response
 
@@ -88,7 +87,7 @@ class TestMutateResponse(unittest.TestCase):
 
         request = DummyRequest(None, DummyResponse())
 
-        MutatorTransform(None, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(None, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': None}, dict(request))
         self.assertEqual({}, dict(request.response))
@@ -98,7 +97,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(view, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual({}, dict(request.response))
@@ -109,7 +108,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(view, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual({}, dict(request.response))
@@ -127,7 +126,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(view, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual({}, dict(request.response))
@@ -145,7 +144,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(view, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual({}, dict(request.response))
@@ -163,7 +162,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(view, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual({}, dict(request.response))
@@ -182,7 +181,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(view, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual(
@@ -204,7 +203,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(view, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual(
@@ -225,7 +224,7 @@ class TestMutateResponse(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -242,7 +241,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(view, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual({'X-Cache-Rule': ['testrule'],
@@ -262,7 +261,7 @@ class TestMutateResponse(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -299,7 +298,7 @@ class TestMutateResponse(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -336,7 +335,7 @@ class TestMutateResponse(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -353,7 +352,7 @@ class TestMutateResponse(unittest.TestCase):
         resource = DummyResource()
         request = DummyRequest(resource.index_html, DummyResponse())
 
-        MutatorTransform(resource, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(resource, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': resource.index_html}, dict(request))
         self.assertEqual({'X-Cache-Rule': ['testrule'],
@@ -373,7 +372,7 @@ class TestMutateResponse(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -390,7 +389,7 @@ class TestMutateResponse(unittest.TestCase):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
 
-        MutatorTransform(view, request).transformUnicode(u'', 'utf-8')
+        MutatorTransform(view, request).transformUnicode('', 'utf-8')
 
         self.assertEqual({'PUBLISHED': view}, dict(request))
         self.assertEqual({}, dict(request.response))
@@ -571,7 +570,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -610,7 +609,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -649,7 +648,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -688,7 +687,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -727,7 +726,7 @@ class TestMutateResponseStreaming(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -865,7 +864,7 @@ class TestIntercept(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -901,7 +900,7 @@ class TestIntercept(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -913,7 +912,7 @@ class TestIntercept(unittest.TestCase):
             def interceptResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
                 response.setStatus(304)
-                return u'dummy'
+                return 'dummy'
 
         provideAdapter(DummyOperation, name='op1')
 
@@ -923,7 +922,7 @@ class TestIntercept(unittest.TestCase):
             intercept(DummyEvent(request))
             self.fail()
         except Intercepted as e:
-            self.assertEqual(u'dummy', e.responseBody)
+            self.assertEqual('dummy', e.responseBody)
             self.assertEqual(304, e.status)
             self.assertEqual(304, request.response.status)
             self.assertEqual(True, request.response.locked)
@@ -955,7 +954,7 @@ class TestIntercept(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -968,7 +967,7 @@ class TestIntercept(unittest.TestCase):
                 response.addHeader('X-Cache-Foo', 'test')
                 response.setStatus(304)
                 self.request.environ['plone.transformchain.disable'] = False
-                return u'dummy'
+                return 'dummy'
 
         provideAdapter(DummyOperation, name='op1')
 
@@ -978,7 +977,7 @@ class TestIntercept(unittest.TestCase):
             intercept(DummyEvent(request))
             self.fail()
         except Intercepted as e:
-            self.assertEqual(u'dummy', e.responseBody)
+            self.assertEqual('dummy', e.responseBody)
             self.assertEqual(304, e.status)
             self.assertEqual(304, request.response.status)
             self.assertEqual(True, request.response.locked)
@@ -1010,7 +1009,7 @@ class TestIntercept(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -1022,7 +1021,7 @@ class TestIntercept(unittest.TestCase):
             def interceptResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
                 response.setStatus(200)
-                return u'dummy'
+                return 'dummy'
 
         provideAdapter(DummyOperation, name='op1')
 
@@ -1032,7 +1031,7 @@ class TestIntercept(unittest.TestCase):
             intercept(DummyEvent(request))
             self.fail()
         except Intercepted as e:
-            self.assertEqual(u'dummy', e.responseBody)
+            self.assertEqual('dummy', e.responseBody)
             self.assertEqual(200, e.status)
             self.assertEqual(200, request.response.status)
             self.assertEqual(True, request.response.locked)
@@ -1064,7 +1063,7 @@ class TestIntercept(unittest.TestCase):
 
         @implementer(ICachingOperation)
         @adapter(Interface, Interface)
-        class DummyOperation(object):
+        class DummyOperation:
 
             def __init__(self, published, request):
                 self.published = published
@@ -1075,7 +1074,7 @@ class TestIntercept(unittest.TestCase):
 
             def interceptResponse(self, rulename, response):
                 response.addHeader('X-Cache-Foo', 'test')
-                return u'dummy'
+                return 'dummy'
 
         provideAdapter(DummyOperation, name='op1')
 
@@ -1089,7 +1088,7 @@ class TestIntercept(unittest.TestCase):
 
         @implementer(IRulesetLookup)
         @adapter(Interface, Interface)
-        class DummyRulesetLookup(object):
+        class DummyRulesetLookup:
 
             def __init__(self, published, request):
                 self.published = published
@@ -1115,7 +1114,7 @@ class TestIntercept(unittest.TestCase):
 
         @implementer(IRulesetLookup)
         @adapter(Interface, Interface)
-        class DummyRulesetLookup(object):
+        class DummyRulesetLookup:
 
             def __init__(self, published, request):
                 self.published = published
@@ -1144,9 +1143,9 @@ class TestIntercept(unittest.TestCase):
     def test_exception_view(self):
         view = DummyView()
         request = DummyRequest(view, DummyResponse())
-        exc = Intercepted(status=200, responseBody=u'Test')
+        exc = Intercepted(status=200, responseBody='Test')
         excView = InterceptorResponse(exc, request)
-        self.assertEqual(u'Test', excView())
+        self.assertEqual('Test', excView())
 
 
 def test_suite():

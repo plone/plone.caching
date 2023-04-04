@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.caching.interfaces import ICachingOperationType
 from plone.caching.utils import lookupOption
 from plone.caching.utils import lookupOptions
@@ -49,7 +48,7 @@ class TestLookupOption(unittest.TestCase):
 
         registry.records['plone.caching.tests.test'] = Record(
             field.TextLine(),
-            u'default'
+            'default'
         )
 
         result = lookupOption(
@@ -58,7 +57,7 @@ class TestLookupOption(unittest.TestCase):
             'test',
             default=_marker
         )
-        self.assertEqual(u'default', result)
+        self.assertEqual('default', result)
 
     def test_lookupOption_override(self):
         provideUtility(Registry(), IRegistry)
@@ -66,11 +65,11 @@ class TestLookupOption(unittest.TestCase):
 
         registry.records['plone.caching.tests.test'] = r = Record(
             field.TextLine(),
-            u'default'
+            'default'
         )
         registry.records['plone.caching.tests.testrule.test'] = Record(
             FieldRef(r.__name__, r.field),
-            u'override'
+            'override'
         )
 
         result = lookupOption(
@@ -79,7 +78,7 @@ class TestLookupOption(unittest.TestCase):
             'test',
             default=_marker
         )
-        self.assertEqual(u'override', result)
+        self.assertEqual('override', result)
 
 
 class TestLookupOptions(unittest.TestCase):
@@ -90,10 +89,10 @@ class TestLookupOptions(unittest.TestCase):
     def test_lookupOptions_no_registry(self):
 
         @provider(ICachingOperationType)
-        class DummyOperation(object):
+        class DummyOperation:
 
-            title = u''
-            description = u''
+            title = ''
+            description = ''
             prefix = 'plone.caching.tests'
             options = ('test1', 'test2',)
 
@@ -104,10 +103,10 @@ class TestLookupOptions(unittest.TestCase):
         provideUtility(Registry(), IRegistry)
 
         @provider(ICachingOperationType)
-        class DummyOperation(object):
+        class DummyOperation:
 
-            title = u''
-            description = u''
+            title = ''
+            description = ''
             prefix = 'plone.caching.tests'
             options = ('test1', 'test2',)
 
@@ -120,19 +119,19 @@ class TestLookupOptions(unittest.TestCase):
 
         registry.records['plone.caching.tests.test2'] = Record(
             field.TextLine(),
-            u'foo'
+            'foo'
         )
 
         @provider(ICachingOperationType)
-        class DummyOperation(object):
+        class DummyOperation:
 
-            title = u''
-            description = u''
+            title = ''
+            description = ''
             prefix = 'plone.caching.tests'
             options = ('test1', 'test2',)
 
         result = lookupOptions(DummyOperation, 'testrule', default=_marker)
-        self.assertEqual({'test1': _marker, 'test2': u'foo'}, result)
+        self.assertEqual({'test1': _marker, 'test2': 'foo'}, result)
 
     def test_lookupOptions_override(self):
         provideUtility(Registry(), IRegistry)
@@ -140,27 +139,27 @@ class TestLookupOptions(unittest.TestCase):
 
         registry.records['plone.caching.tests.test1'] = Record(
             field.TextLine(),
-            u'foo'
+            'foo'
         )
         registry.records['plone.caching.tests.test2'] = Record(
             field.TextLine(),
-            u'bar'
+            'bar'
         )
         registry.records['plone.caching.tests.testrule.test2'] = Record(
             field.TextLine(),
-            u'baz'
+            'baz'
         )
 
         @provider(ICachingOperationType)
-        class DummyOperation(object):
+        class DummyOperation:
 
-            title = u''
-            description = u''
+            title = ''
+            description = ''
             prefix = 'plone.caching.tests'
             options = ('test1', 'test2',)
 
         result = lookupOptions(DummyOperation, 'testrule', default=_marker)
-        self.assertEqual({'test1': u'foo', 'test2': u'baz'}, result)
+        self.assertEqual({'test1': 'foo', 'test2': 'baz'}, result)
 
     def test_lookupOptions_named(self):
         provideUtility(Registry(), IRegistry)
@@ -168,25 +167,25 @@ class TestLookupOptions(unittest.TestCase):
 
         registry.records['plone.caching.tests.test2'] = Record(
             field.TextLine(),
-            u'foo'
+            'foo'
         )
 
         @provider(ICachingOperationType)
-        class DummyOperation(object):
+        class DummyOperation:
 
-            title = u''
-            description = u''
+            title = ''
+            description = ''
             prefix = 'plone.caching.tests'
             options = ('test1', 'test2',)
 
-        provideUtility(DummyOperation, name=u'plone.caching.tests')
+        provideUtility(DummyOperation, name='plone.caching.tests')
 
         result = lookupOptions(
-            u'plone.caching.tests',
+            'plone.caching.tests',
             'testrule',
             default=_marker
         )
-        self.assertEqual({'test1': _marker, 'test2': u'foo'}, result)
+        self.assertEqual({'test1': _marker, 'test2': 'foo'}, result)
 
 
 def test_suite():

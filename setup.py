@@ -51,8 +51,12 @@ setup(
         "zope.i18nmessageid",
         "zope.schema",
         "plone.transformchain",
-        "Zope2 >= 2.12.4",
     ],
+    extras_require={
+        "test": [
+            "plone.testing",
+        ],
+    },
     entry_points="""
       # -*- Entry points: -*-
       """,

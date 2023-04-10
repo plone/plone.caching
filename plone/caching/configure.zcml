@@ -1,38 +1,51 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:browser="http://namespaces.zope.org/browser"
-    i18n_domain="plone">
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="plone"
+    >
 
-    <include package="z3c.caching" file="meta.zcml" />
-    <include package="z3c.caching" />
+  <include
+      package="z3c.caching"
+      file="meta.zcml"
+      />
+  <include package="z3c.caching" />
 
-    <include package="plone.registry" />
-    <include package="plone.transformchain" />
+  <include package="plone.registry" />
+  <include package="plone.transformchain" />
 
-    <!-- Default lookup -->
-    <adapter factory=".lookup.DefaultRulesetLookup" />
+  <!-- Default lookup -->
+  <adapter factory=".lookup.DefaultRulesetLookup" />
 
-    <!-- The 'Chain' operation -->
-    <adapter factory=".operations.Chain"   name="plone.caching.operations.chain" />
-    <utility component=".operations.Chain" name="plone.caching.operations.chain" />
+  <!-- The 'Chain' operation -->
+  <adapter
+      factory=".operations.Chain"
+      name="plone.caching.operations.chain"
+      />
+  <utility
+      name="plone.caching.operations.chain"
+      component=".operations.Chain"
+      />
 
-    <!-- Intercepts are performed by raising an exception prior to view
+  <!-- Intercepts are performed by raising an exception prior to view
          invocation. There is a view on this exception which renders the
          intercepted response.
      -->
-    <subscriber handler=".hooks.intercept" />
-    <browser:page
-        name="index.html"
-        for=".hooks.Intercepted"
-        class=".hooks.InterceptorResponse"
-        permission="zope2.Public"
-        />
+  <subscriber handler=".hooks.intercept" />
+  <browser:page
+      name="index.html"
+      for=".hooks.Intercepted"
+      class=".hooks.InterceptorResponse"
+      permission="zope2.Public"
+      />
 
-    <!-- Mutator: plone.transformchain order 12000 -->
-    <adapter factory=".hooks.MutatorTransform" name="plone.caching.mutator" />
+  <!-- Mutator: plone.transformchain order 12000 -->
+  <adapter
+      factory=".hooks.MutatorTransform"
+      name="plone.caching.mutator"
+      />
 
-    <!-- Mutator for streaming responses -->
-    <subscriber handler=".hooks.modifyStreamingResponse" />
+  <!-- Mutator for streaming responses -->
+  <subscriber handler=".hooks.modifyStreamingResponse" />
 
 </configure>

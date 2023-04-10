@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.caching.interfaces import X_CACHE_OPERATION_HEADER
 from plone.caching.interfaces import X_CACHE_RULE_HEADER
 from plone.caching.utils import findOperation
@@ -16,7 +15,7 @@ from ZPublisher.interfaces import IPubBeforeStreaming
 import logging
 
 
-logger = logging.getLogger('plone.caching')
+logger = logging.getLogger("plone.caching")
 
 
 class IStreamedResponse(Interface):
@@ -36,12 +35,12 @@ class Intercepted(Exception):
     responseBody = None
     status = None
 
-    def __init__(self, status=304, responseBody=u""):
+    def __init__(self, status=304, responseBody=""):
         self.status = status
         self.responseBody = responseBody
 
 
-class InterceptorResponse(object):
+class InterceptorResponse:
     """View for the Intercepted exception, serving to return an empty
     response in the case of an intercepted response.
     """
@@ -67,7 +66,7 @@ def intercept(event):
 
     try:
         request = event.request
-        published = request.get('PUBLISHED', None)
+        published = request.get("PUBLISHED", None)
         rule, operationName, operation = findOperation(request)
 
         if rule is None:
@@ -75,10 +74,7 @@ def intercept(event):
 
         request.response.setHeader(X_CACHE_RULE_HEADER, rule)
         logger.debug(
-            'Published: %s Ruleset: %s Operation: %s',
-            repr(published),
-            rule,
-            operation
+            "Published: %s Ruleset: %s Operation: %s", repr(published), rule, operation
         )
 
         if operation is not None:
@@ -87,10 +83,7 @@ def intercept(event):
             if responseBody is not None:
                 # Only put this in the response if the operation actually
                 # intercepted something
-                request.response.setHeader(
-                    X_CACHE_OPERATION_HEADER,
-                    operationName
-                )
+                request.response.setHeader(X_CACHE_OPERATION_HEADER, operationName)
 
                 # Stop any post-processing, including the operation's response
                 # modification
@@ -111,14 +104,13 @@ def intercept(event):
         raise
     except Exception:
         logging.exception(
-            'Swallowed exception in plone.caching IPubAfterTraversal event '
-            'handler'
+            "Swallowed exception in plone.caching IPubAfterTraversal event " "handler"
         )
 
 
 @implementer(ITransform)
 @adapter(Interface, Interface)
-class MutatorTransform(object):
+class MutatorTransform:
     """Transformation using plone.transformchain.
 
     This is registered at order 12000, i.e. "late". A typical transform
@@ -159,7 +151,7 @@ class MutatorTransform(object):
         if IStreamedResponse.providedBy(request):
             return
 
-        published = request.get('PUBLISHED', None)
+        published = request.get("PUBLISHED", None)
         rule, operationName, operation = findOperation(request)
 
         if rule is None:
@@ -167,15 +159,13 @@ class MutatorTransform(object):
 
         request.response.setHeader(X_CACHE_RULE_HEADER, rule)
         logger.debug(
-            'Published: %s Ruleset: %s Operation: %s',
-            repr(published),
-            rule,
-            operation
+            "Published: %s Ruleset: %s Operation: %s", repr(published), rule, operation
         )
 
         if operation is not None:
             request.response.setHeader(X_CACHE_OPERATION_HEADER, operationName)
             operation.modifyResponse(rule, request.response)
+
 
 # Hook for streaming responses - does not use plone.transformchain, since
 # sequencing is less likely to be an issue here
@@ -199,7 +189,7 @@ def modifyStreamingResponse(event):
     # again in the normal hook above
     alsoProvides(request, IStreamedResponse)
 
-    published = request.get('PUBLISHED', None)
+    published = request.get("PUBLISHED", None)
 
     rule, operationName, operation = findOperation(request)
 
@@ -208,10 +198,7 @@ def modifyStreamingResponse(event):
 
     response.setHeader(X_CACHE_RULE_HEADER, rule)
     logger.debug(
-        'Published: %s Ruleset: %s Operation: %s',
-        repr(published),
-        rule,
-        operation
+        "Published: %s Ruleset: %s Operation: %s", repr(published), rule, operation
     )
 
     if operation is not None:

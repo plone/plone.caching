@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.caching.interfaces import IRulesetLookup
 from z3c.caching.registry import lookup
 from zope.component import adapter
@@ -8,7 +7,7 @@ from zope.interface import Interface
 
 @implementer(IRulesetLookup)
 @adapter(Interface, Interface)
-class DefaultRulesetLookup(object):
+class DefaultRulesetLookup:
     """Default ruleset lookup.
 
     Only override this if you have very special needs. The safest option is

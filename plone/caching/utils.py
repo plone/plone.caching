@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.caching.interfaces import ICacheSettings
 from plone.caching.interfaces import ICachingOperation
 from plone.caching.interfaces import ICachingOperationType
@@ -30,13 +29,9 @@ def lookupOptions(type_, rulename, default=None):
     options = {}
     registry = queryUtility(IRegistry)
 
-    for option in getattr(type_, 'options', ()):
+    for option in getattr(type_, "options", ()):
         options[option] = lookupOption(
-            type_.prefix,
-            rulename,
-            option,
-            default,
-            registry
+            type_.prefix, rulename, option, default, registry
         )
 
     return options
@@ -66,11 +61,22 @@ def lookupOption(prefix, rulename, option, default=None, _registry=None):
     if registry is None:
         return default
 
-    key = '.'.join((prefix, rulename, option,))
+    key = ".".join(
+        (
+            prefix,
+            rulename,
+            option,
+        )
+    )
     if key in registry:
         return registry[key]
 
-    key = '.'.join((prefix, option,))
+    key = ".".join(
+        (
+            prefix,
+            option,
+        )
+    )
     if key in registry:
         return registry[key]
 
@@ -78,14 +84,13 @@ def lookupOption(prefix, rulename, option, default=None, _registry=None):
 
 
 def findOperation(request):
-
-    published = request.get('PUBLISHED', None)
+    published = request.get("PUBLISHED", None)
     if published is None:
         return None, None, None
 
     # If we get a method, try to look up its class
     if isinstance(published, types.MethodType):
-        published = getattr(published, '__self__', published)
+        published = getattr(published, "__self__", published)
 
     registry = queryUtility(IRegistry)
     if registry is None:
@@ -98,7 +103,13 @@ def findOperation(request):
     if settings.operationMapping is None:
         return None, None, None
 
-    lookup = queryMultiAdapter((published, request,), IRulesetLookup)
+    lookup = queryMultiAdapter(
+        (
+            published,
+            request,
+        ),
+        IRulesetLookup,
+    )
     if lookup is None:
         return None, None, None
 
@@ -113,8 +124,6 @@ def findOperation(request):
         return rule, None, None
 
     operation = queryMultiAdapter(
-        (published, request),
-        ICachingOperation,
-        name=operationName
+        (published, request), ICachingOperation, name=operationName
     )
     return rule, operationName, operation

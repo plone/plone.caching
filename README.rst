@@ -139,7 +139,7 @@ that provided by `plone.app.caching`_. If "explicit" mode is set in
 
 Hints:
 
-* Try to re-use existing rule sets rather than invent your own.
+* Try to reuse existing rule sets rather than invent your own.
 * Rule sets inherit according to the same rules as those that apply to
   adapters. Thus, you can register a generic rule set for a generic interface
   or base class, and then override it for a more specific class or interface.

@@ -42,13 +42,10 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "setuptools",
-        "z3c.caching [zcml]",
         "plone.registry",
-        "zope.interface",
-        "zope.component",
-        "zope.i18nmessageid",
-        "zope.schema",
         "plone.transformchain",
+        "Zope",
+        "z3c.caching [zcml]",
     ],
     extras_require={
         "test": [

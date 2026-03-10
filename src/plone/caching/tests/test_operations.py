@@ -13,7 +13,6 @@ from zope.interface import Interface
 
 import unittest
 
-
 _marker = object()
 
 

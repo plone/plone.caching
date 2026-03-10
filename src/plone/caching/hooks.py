@@ -14,7 +14,6 @@ from ZPublisher.interfaces import IPubBeforeStreaming
 
 import logging
 
-
 logger = logging.getLogger("plone.caching")
 
 
